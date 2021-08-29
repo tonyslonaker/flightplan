@@ -1,0 +1,17 @@
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    font-family: 'Rubik', sans-serif;
+    /* font-family: 'Noto Sans SC', sans-serif; */
+    padding-bottom: 8em;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+h1, h5 {
+    font-weight: bold;
+    z-index: 1;
+}
