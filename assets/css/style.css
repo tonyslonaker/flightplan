@@ -1,17 +1,49 @@
-body {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
-    font-family: 'Rubik', sans-serif;
-    /* font-family: 'Noto Sans SC', sans-serif; */
-    padding-bottom: 8em;
+.hero {
+    background-image: url(../media/beach.JPG);
+    background-position: center;
+    background-repeat:  no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-color: #999;
 }
 
-main {
-    flex: 1 0 auto;
+.header {
+    margin-top: 100px;
+    max-height:180px;
 }
 
-h1, h5 {
+
+
+.title {
     font-weight: bold;
-    z-index: 1;
+    color: rgb(255, 137, 68);
+}
+
+.subtitle {
+    padding-bottom: 3rem;
+}
+
+.far {
+    padding-left: 4px;
+}
+
+.input {
+    max-width: 200px;
+}
+
+@media screen and (max-width: 1025px ) {
+.header {
+    margin-top: 0px;
+    padding: 0px;
+}
+
+.subtitle {
+    padding-bottom: 0;
+}
+    
+.columns {
+    display: flex;
+    flex-direction: column;
+}
+    
 }
