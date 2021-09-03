@@ -4,29 +4,37 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
     <link rel="stylesheet" href="./assets/css/style.css">
-    <title>Document</title>
+    <title>Eventful Trip</title>
 </head>
-<header>
-    <h1>FLIGHTPLAN</h1>
-</header>
-
 <body>
-
-    <main>
-
-        <div>
-            <div>
-                <h2></h2>
+    <section class="hero is-fullheight">
+            <div class="header is-overlay has-text-centered">
+                <h1 class="title is-1">Plan your eventful trip</h1>
+                <h2 class="subtitle is-4 has-text-primary">Real time events and flight</h2>
+                <div class="columns is-centered is-vcentered is-desktop">
+                    <div class="column is-narrow">
+                        <input id="from-input" class="input is-primary is-normal" type="text" placeholder="From">
+                    </div>
+                    <div class="column is-narrow">
+                        <button class="button is-primary" type="submit">Departure Date<i class="far fa-calendar-alt"></i></button>
+                    </div>
+                    <div class="column is-narrow">
+                        <input id="to-input" class="input is-primary is-normal"type="text" placeholder="To">
+                    </div>
+                    <div class="column is-narrow">
+                        <button  class="button is-primary" type="submit">Return Date<i class="far fa-calendar-alt"></i></button>
+                    </div>
+                    <div class="column is-narrow">
+                        <input id="passengers" class="input is-primary is-normal"type="text" placeholder="# of passengers">
+                    </div>
+                    <div class="column is-narrow">
+                        <button  class="button is-primary" type="submit">Search</button>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-    </main>
-
-    <footer>
-        <h5></h5>
-    </footer>
-<script src="./assets/js/scrypt.js"></script>
+    </section>
 </body>
-
 </html>
