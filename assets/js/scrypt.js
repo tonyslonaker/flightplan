@@ -1,12 +1,19 @@
 
 
-function skyscannerAPI()  {
-    var apiUrl ="";
+// api call function 
+function eventbriteAPI() {
 
-    fetch(apiUrl).then(function(response) {
-        console.log(response)
-    })
+    var queryURL = "https://www.eventbrite.com/oauth/authorize?";
 
+    $.ajax( {
+        url: queryURL,
+        method: "GET",
+        beforeSend: function (request) {
+            request.withCredentials = true;
+            request.setRequestHeader("Authorization", "Bearer YENZAWNHDK56II2POHDS");
+        },
+    })  
 };
 
-skyscannerAPI();
+
+eventbriteAPI()
