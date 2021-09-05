@@ -3,17 +3,12 @@
 // api call function 
 function eventbriteAPI() {
 
-    var queryURL = "https://www.eventbrite.com/oauth/authorize?";
-
     $.ajax( {
-        url: queryURL,
+        api_url: 'https://www.eventbrite.com/oauth/authorize?response_type=code&client_id=XNA4KEFKZNDI4JA7LP&redirect_uri=https://tonyslonaker.github.io/flightplan/?code=YENZAWNHDK56II2POHDS',
         method: "GET",
-        beforeSend: function (request) {
-            request.withCredentials = true;
-            request.setRequestHeader("Authorization", "Bearer YENZAWNHDK56II2POHDS");
-        },
+        Authorization: "Bearer XCNZDMHCVBBHQM7FQR3C",
+        Headers: "events"
     })  
 };
 
-
-eventbriteAPI()
+eventbriteAPI();

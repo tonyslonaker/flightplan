@@ -35,6 +35,31 @@
                     </div>
                 </div>
             </div>
+
+            <div class="columns is-left is-vcentered eventTable">
+                <h4 id="goToEvents">Events</h4>
+                <div class="input-field">
+                    <select multiple id='filter'>
+                    </select>
+                    <label>Event Category Filter</label>
+                </div>
+                <div class="column">
+                    <table class="highlight responsive-table" id="eventsTable">
+                        <thead>
+                            <tr class="eventHeading is-family-primary">
+                                <td>Event Name</td>
+                                <td>Category</td>
+                                <td>Date/Time</td>
+                                <td>Price ($)</td>
+                                <td>More Info</td>
+                            </tr>
+                        </thead>
+                        <tbody id="events">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
     </section>
     <script src="./assets/js/jquery-3.4.1.min.js"></script>
     <script src="./assets/js/materialize.min.js"></script>
