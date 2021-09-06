@@ -2,17 +2,81 @@ let flightSearchFormE1 = document.getElementById('flight-search-button');
 let flightQuoteResultsE1 = document.getElementById('flight-quote-results');
 let returnFlightQuoteResultsE1 = document.getElementById('return-flight-quote-results');
 
+// Get planned trip information from local storage
+function getPlannedTripInformation() {
+    const plannedTrip = JSON.parse(localStorage.getItem("plannedTrip")) || {};
+
+    return plannedTrip;
+}
 
 // Save Flight Information
-function updatePlannedTripInformation(flights) {
-    // let plannedTrip = localStorage.getItem("plannedTrip") || {};
+function saveFlightData(quoteId, originId, destinationId) {
+    alert(JSON.stringify({
+        quoteId, 
+        originId,
+        destinationId
+    }));
 
-    localStorage.setItem("plannedTrip", JSON.stringify(flights));
+    // Get flight information from session storage
+    let storedSessionFlights = JSON.parse(sessionStorage.getItem('returnedFlights')) || {};
+
+    console.log('Session Flights: ', storedSessionFlights);
+
+    // Check if session flights are returned. If not, we need to alert the user
+    if (!storedSessionFlights) {
+        alert('Unable to save flight data. 1'); // Take out after testing
+        console.log({ error: "No session flights were found." });
+        // TODO: Somehow alert the user that we were unable to save the flight
+        //
+        //
+        return;
+    }
+    let flightType;
+    let flightDetails = {};
+
+    // Loop through outbound flights and determine if we have a match
+    for (let i = 0; i < storedSessionFlights.flights.Quotes.length; i++) {
+        if (quoteId === storedSessionFlights.flights.Quotes[i].QuoteId && 
+            originId === storedSessionFlights.flights.Quotes[i].OutboundLeg.OriginId && 
+            destinationId === storedSessionFlights.flights.Quotes[i].OutboundLeg.DestinationId) {
+                flightType = "outboundFlight";
+                flightDetails = storedSessionFlights.flights.Quotes[i];
+            }
+    }
+
+    // Loop through return flights and determine if we have a match
+    for (let i = 0; i < storedSessionFlights.returnFlights.Quotes.length; i++) {
+        if (quoteId === storedSessionFlights.returnFlights.Quotes[i].QuoteId && 
+            originId === storedSessionFlights.returnFlights.Quotes[i].OutboundLeg.OriginId && 
+            destinationId === storedSessionFlights.returnFlights.Quotes[i].OutboundLeg.DestinationId) {
+                flightType = "returnFlight";
+                flightDetails = storedSessionFlights.flights.Quotes[i]
+            }
+    }
+
+    // Verify that we did get a flight match
+    if (!flightType || !flightDetails?.QuoteId) {
+        alert('Unable to save flight data. 2'); // Take out after testing
+        console.log({ error: "No session flights were found." });
+        // TODO: Somehow alert the user that we were unable to save the flight
+        //
+        //
+        return;
+    }
+
+    // Save flight information in corresponding flight type object
+    let plannedTrip = JSON.parse(localStorage.getItem("plannedTrip")) || {};
+    localStorage.setItem("plannedTrip", JSON.stringify({
+        ...plannedTrip,
+        [flightType]: {
+            ...flightDetails // Store new flight details
+        }
+    }));
 }
 
 // Save Returned Flight Data in Session Storage
 function saveReturnedFlightData(flights, returnFlights) {
-    sessionStorage.setItem("Returned Flights", JSON.stringify({
+    sessionStorage.setItem("returnedFlights", JSON.stringify({
         flights, 
         returnFlights
     }));
@@ -95,12 +159,10 @@ function renderFlightList(parentElement, flights, searchParams) {
     parentElement.appendChild(flightList);
 }
 
-
 // Convert to currency
 function convertToCurrency(num) {
     return `$${num}`;
 }
-
 
 // Compile Flight Quote Card
 function compileFlightQuoteCard(flightDetails) {
@@ -118,13 +180,12 @@ function compileFlightQuoteCard(flightDetails) {
                 <p>Departure Date: ${moment(flightDetails.OutboundLeg.DepartureDate).format('MM/DD/YYYY H:mm')}</p>
                 <p>Direct Flight: ${flightDetails.Direct}</p>
                 <p>Min. Price: ${convertToCurrency(flightDetails.MinPrice)}</p>
-                <button id="${flightDetails.QuoteId}-${flightDetails.OutboundLeg.OriginId}-${flightDetails.OutboundLeg.DestinationId}">Save Flight</button>
+                <button id="${flightDetails.QuoteId}-${flightDetails.OutboundLeg.OriginId}-${flightDetails.OutboundLeg.DestinationId}" onClick="saveFlightData(${flightDetails.QuoteId}, ${flightDetails.OutboundLeg.OriginId}, ${flightDetails.OutboundLeg.DestinationId})">Save Flight</button>
             </div>
         </div>
     `;
     return quoteCard;
 } 
-
 
 // Call Flight Quote API
 async function callSkyScannerAPI(origin, destination, takeOffDate) {
@@ -145,11 +206,11 @@ async function callSkyScannerAPI(origin, destination, takeOffDate) {
     .catch(error => console.log('error', error));
 }
 
-
 // Search flights and events
 async function searchFlightsAndEvents(event) {
     event.preventDefault();
-    // 
+
+    // Get user form search data
     let departDate = moment(document.getElementById('departure-date').value).format("YYYY-MM-DD");
     let returnDate = moment(document.getElementById('return-date').value).format('YYYY-MM-DD');
     let origin = document.getElementById('origin-input').value;
@@ -173,12 +234,12 @@ async function searchFlightsAndEvents(event) {
         returnDate
     });
 
-    // Save flights in sessino storage
-    saveReturnedFlightData(flightResults, returnFlightResults);
+    // Save flights in session storage
+    saveReturnedFlightData(JSON.parse(flightResults), JSON.parse(returnFlightResults));
 
     // Search Events? 
-
+    //
+    //
 }
-
 
 flightSearchFormE1.addEventListener("click", searchFlightsAndEvents);
