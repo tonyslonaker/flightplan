@@ -9,8 +9,30 @@ function getPlannedTripInformation() {
     return plannedTrip;
 }
 
-// Save Flight Information
-function saveFlightData(quoteId, originId, destinationId) {
+// Remove saved flight
+function removeSavedFlight(flightType) {
+    let plannedTrip = getPlannedTripInformation();
+
+    if (flightType === "flight-quote-results") {
+        flightType = "outboundFlight";
+    } else if (flightType === "return-flight-quote-results") {
+        flightType = "returnFlight";
+    } else {
+        console.log({ error: "Unable to remove saved flight." })
+        return;
+    }
+
+    // update saved flight to empty object depending on the flight type
+    localStorage.setItem("plannedTrip", JSON.stringify({
+        ...plannedTrip,
+        [flightType]: {}
+    }));
+
+    // renderFlightList();
+}
+
+// Save flight information in local storage
+function saveFlightData(quoteId, originId, destinationId, flightType) {
     alert(JSON.stringify({
         quoteId, 
         originId,
@@ -31,27 +53,35 @@ function saveFlightData(quoteId, originId, destinationId) {
         //
         return;
     }
-    let flightType;
+
     let flightDetails = {};
 
-    // Loop through outbound flights and determine if we have a match
-    for (let i = 0; i < storedSessionFlights.flights.Quotes.length; i++) {
-        if (quoteId === storedSessionFlights.flights.Quotes[i].QuoteId && 
-            originId === storedSessionFlights.flights.Quotes[i].OutboundLeg.OriginId && 
-            destinationId === storedSessionFlights.flights.Quotes[i].OutboundLeg.DestinationId) {
-                flightType = "outboundFlight";
-                flightDetails = storedSessionFlights.flights.Quotes[i];
-            }
-    }
 
-    // Loop through return flights and determine if we have a match
-    for (let i = 0; i < storedSessionFlights.returnFlights.Quotes.length; i++) {
-        if (quoteId === storedSessionFlights.returnFlights.Quotes[i].QuoteId && 
-            originId === storedSessionFlights.returnFlights.Quotes[i].OutboundLeg.OriginId && 
-            destinationId === storedSessionFlights.returnFlights.Quotes[i].OutboundLeg.DestinationId) {
-                flightType = "returnFlight";
-                flightDetails = storedSessionFlights.flights.Quotes[i]
-            }
+    if (flightType === "flight-quote-results") {
+        flightType = "outboundFlight";
+
+        // Loop through outbound flights and determine if we have a match
+        for (let i = 0; i < storedSessionFlights.flights.Quotes.length; i++) {
+            if (quoteId === storedSessionFlights.flights.Quotes[i].QuoteId && 
+                originId === storedSessionFlights.flights.Quotes[i].OutboundLeg.OriginId && 
+                destinationId === storedSessionFlights.flights.Quotes[i].OutboundLeg.DestinationId) {
+                    flightDetails = storedSessionFlights.flights.Quotes[i];
+                }
+        }
+    } else if (flightType === "return-flight-quote-results") {
+        flightType = "returnFlight";
+
+         // Loop through return flights and determine if we have a match
+        for (let i = 0; i < storedSessionFlights.returnFlights.Quotes.length; i++) {
+            if (quoteId === storedSessionFlights.returnFlights.Quotes[i].QuoteId && 
+                originId === storedSessionFlights.returnFlights.Quotes[i].OutboundLeg.OriginId && 
+                destinationId === storedSessionFlights.returnFlights.Quotes[i].OutboundLeg.DestinationId) {
+                    flightDetails = storedSessionFlights.returnFlights.Quotes[i]
+                }
+        }
+    } else {
+        console.log({ error: "Unable to save flight." })
+        return;
     }
 
     // Verify that we did get a flight match
@@ -65,13 +95,21 @@ function saveFlightData(quoteId, originId, destinationId) {
     }
 
     // Save flight information in corresponding flight type object
-    let plannedTrip = JSON.parse(localStorage.getItem("plannedTrip")) || {};
+    let plannedTrip = getPlannedTripInformation();
     localStorage.setItem("plannedTrip", JSON.stringify({
         ...plannedTrip,
         [flightType]: {
             ...flightDetails // Store new flight details
         }
     }));
+
+    // Re-render flights
+    // renderFlightList();
+}
+
+// Get Saved Flight Data in Session Storage
+function getSessionFlightData() {
+    return JSON.parse(sessionStorage.getItem("returnedFlights"));
 }
 
 // Save Returned Flight Data in Session Storage
@@ -83,14 +121,28 @@ function saveReturnedFlightData(flights, returnFlights) {
 }
 
 // Render flights
-function renderFlightList(parentElement, flights, searchParams) {
+function renderFlightList(parentElement, searchParams) {
+    // Get session flights
+    let flights = getSessionFlightData(); 
+
+    // Determine which type we want to render - Outbound/Return flights
+    if (parentElement.id == "flight-quote-results") {
+        // Get outbound flights
+        flights = flights.flights;
+    } else if (parentElement.id == "return-flight-quote-results") {
+        // Get return flights
+        flights = flights.returnFlights;
+    } else {
+        console.log({ error: 'Unable to determine flight type.'} );
+    }
+
+
     // set the innerHTML for the current container to nothing.
     parentElement.innerHTML = "";
 
     // Create flight quote details headings div
     let flightQuoteDetailsHeader = document.createElement('div');
     flightQuoteDetailsHeader.innerHTML = `
-            <h2>Flight Quote Results</h2>
             <h3>${searchParams.origin} -> ${searchParams.destination}</h3>
         `;
 
@@ -143,7 +195,7 @@ function renderFlightList(parentElement, flights, searchParams) {
             };
 
             // Compile the flight quote card html
-            let quoteCard = compileFlightQuoteCard(flightDetails);
+            let quoteCard = compileFlightQuoteCard(flightDetails, parentElement.id);
             flightList.appendChild(quoteCard);
         }
     } else {
@@ -164,8 +216,48 @@ function convertToCurrency(num) {
     return `$${num}`;
 }
 
+// Match saved flights to session flights
+function matchAgainstSavedFlights(flightType, quoteId, originId, destinationId) {
+    let plannedTrip = getPlannedTripInformation();
+    let flightDetails;
+    let match = false;
+
+    // Determine what the type is and get the planned flight details for that type
+    if (flightType == "flight-quote-results") {
+        // Get outbound flight details
+        flightDetails = plannedTrip.outboundFlight;
+    } else if (flightType == "return-flight-quote-results") {
+        // Get return flight details
+        flightDetails = plannedTrip.returnFlight;
+    } else {
+        console.log({ error: 'Unable to determine flight type.'} );
+        return match;
+    }
+
+    // If nothing is stored, return false
+    if (!flightDetails?.QuoteId) {
+        return match;
+    }
+
+    // Check if it is a match
+    if (flightDetails.QuoteId === quoteId && 
+        flightDetails.OutboundLeg.OriginId === originId && 
+        flightDetails.OutboundLeg.DestinationId === destinationId) {
+            match = true;
+        }  
+
+    return match; 
+}
+
 // Compile Flight Quote Card
-function compileFlightQuoteCard(flightDetails) {
+function compileFlightQuoteCard(flightDetails, flightType) {
+    // Check if we have saved this flight
+    let matchedFlight = matchAgainstSavedFlights(flightType, flightDetails.QuoteId, flightDetails.OutboundLeg.OriginId, flightDetails.OutboundLeg.DestinationId);
+    let button = `<button class="button is-success" id="${flightDetails.QuoteId}-${flightDetails.OutboundLeg.OriginId}-${flightDetails.OutboundLeg.DestinationId}" onClick="saveFlightData(${flightDetails.QuoteId}, ${flightDetails.OutboundLeg.OriginId}, ${flightDetails.OutboundLeg.DestinationId}, '${flightType}')">Save Flight</button>`;
+    if (matchedFlight) {
+        button = `<button class="button is-danger" id="${flightDetails.QuoteId}-${flightDetails.OutboundLeg.OriginId}-${flightDetails.OutboundLeg.DestinationId}" onClick="removeSavedFlight('${flightType}')">Remove Saved Flight</button>`;
+    }
+
     // alert(JSON.stringify(flightDetails.carrierNameList));
     let quoteCard = document.createElement("div");
     quoteCard.className = "card flight-quote-card";
@@ -180,7 +272,7 @@ function compileFlightQuoteCard(flightDetails) {
                 <p>Departure Date: ${moment(flightDetails.OutboundLeg.DepartureDate).format('MM/DD/YYYY H:mm')}</p>
                 <p>Direct Flight: ${flightDetails.Direct}</p>
                 <p>Min. Price: ${convertToCurrency(flightDetails.MinPrice)}</p>
-                <button id="${flightDetails.QuoteId}-${flightDetails.OutboundLeg.OriginId}-${flightDetails.OutboundLeg.DestinationId}" onClick="saveFlightData(${flightDetails.QuoteId}, ${flightDetails.OutboundLeg.OriginId}, ${flightDetails.OutboundLeg.DestinationId})">Save Flight</button>
+                ${button}
             </div>
         </div>
     `;
@@ -218,24 +310,26 @@ async function searchFlightsAndEvents(event) {
 
     // First flight search - From origin to destination
     let flightResults = await callSkyScannerAPI(origin, destination, departDate);
-    renderFlightList(flightQuoteResultsE1, JSON.parse(flightResults), {
-        origin,
-        destination,
-        departDate,
-        returnDate
-    });
 
     // Second flight search - From destination back to origin
     let returnFlightResults = await callSkyScannerAPI(destination, origin, returnDate);
-    renderFlightList(returnFlightQuoteResultsE1, JSON.parse(returnFlightResults), {
+    
+    // Save flights in session storage
+    saveReturnedFlightData(JSON.parse(flightResults), JSON.parse(returnFlightResults));
+    
+    renderFlightList(flightQuoteResultsE1, {
         origin,
         destination,
         departDate,
         returnDate
     });
 
-    // Save flights in session storage
-    saveReturnedFlightData(JSON.parse(flightResults), JSON.parse(returnFlightResults));
+    renderFlightList(returnFlightQuoteResultsE1, {
+        origin,
+        destination,
+        departDate,
+        returnDate
+    });
 
     // Search Events? 
     //
