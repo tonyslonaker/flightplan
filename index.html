@@ -30,8 +30,8 @@
                 <a class="navbar-item is-active">
                   Flight Search
                 </a>
-                <a class="navbar-item">
-                  My Planned Trips
+                <a class="navbar-item" id="my-planned-trip-link" onClick="openPlannedTripModal()">
+                  My Planned Trip
                 </a>
               </div>
             </div>
@@ -97,6 +97,19 @@
         </div>
     </section>
 
+    <!-- My Planned Trip Modal -->
+    
+        <div class="modal" id="planned-trip-modal">
+            <div class="modal-background"></div>
+            <div class="modal-content">
+              <h4>My Planned Trip Modal</h4>
+              <hr />
+              <div id="planned-trip-modal-content-container">
+
+              </div>
+            </div>
+            <button class="modal-close is-large" onClick="closePlannedTripModal()" aria-label="close"></button>
+        </div>
 
 
     <!-- Scripts -->

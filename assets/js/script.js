@@ -1,6 +1,23 @@
 let flightSearchFormE1 = document.getElementById('flight-search-button');
 let flightQuoteResultsE1 = document.getElementById('flight-quote-results');
 let returnFlightQuoteResultsE1 = document.getElementById('return-flight-quote-results');
+let plannedTripModalE1 = document.getElementById('planned-trip-modal');
+let plannedTripModalContentE1 = document.getElementById('planned-trip-modal-content-container');
+
+// Open planned trip modal
+function openPlannedTripModal() {
+    let plannedTrip = getPlannedTripInformation();
+
+    plannedTripModalE1.className = "modal is-active";
+
+    plannedTripModalContentE1.innerHTML = JSON.stringify(plannedTrip);
+    
+}
+
+// Close planned trip modal
+function closePlannedTripModal() {
+    plannedTripModalE1.className = "modal";
+}
 
 // Get planned trip information from local storage
 function getPlannedTripInformation() {
@@ -12,11 +29,14 @@ function getPlannedTripInformation() {
 // Remove saved flight
 function removeSavedFlight(flightType) {
     let plannedTrip = getPlannedTripInformation();
+    let parentElement;
 
     if (flightType === "flight-quote-results") {
-        flightType = "outboundFlight";
+        flightType = "outboundFlight"; 
+        parentElement = flightQuoteResultsE1;
     } else if (flightType === "return-flight-quote-results") {
         flightType = "returnFlight";
+        parentElement = returnFlightQuoteResultsE1;
     } else {
         console.log({ error: "Unable to remove saved flight." })
         return;
@@ -28,16 +48,16 @@ function removeSavedFlight(flightType) {
         [flightType]: {}
     }));
 
-    // renderFlightList();
+    renderFlightList(parentElement, {});
 }
 
 // Save flight information in local storage
 function saveFlightData(quoteId, originId, destinationId, flightType) {
-    alert(JSON.stringify({
-        quoteId, 
-        originId,
-        destinationId
-    }));
+    // alert(JSON.stringify({
+    //     quoteId, 
+    //     originId,
+    //     destinationId
+    // }));
 
     // Get flight information from session storage
     let storedSessionFlights = JSON.parse(sessionStorage.getItem('returnedFlights')) || {};
@@ -46,7 +66,7 @@ function saveFlightData(quoteId, originId, destinationId, flightType) {
 
     // Check if session flights are returned. If not, we need to alert the user
     if (!storedSessionFlights) {
-        alert('Unable to save flight data. 1'); // Take out after testing
+        // alert('Unable to save flight data. 1'); // Take out after testing
         console.log({ error: "No session flights were found." });
         // TODO: Somehow alert the user that we were unable to save the flight
         //
@@ -59,7 +79,7 @@ function saveFlightData(quoteId, originId, destinationId, flightType) {
 
     if (flightType === "flight-quote-results") {
         flightType = "outboundFlight";
-
+        parentElement = flightQuoteResultsE1;
         // Loop through outbound flights and determine if we have a match
         for (let i = 0; i < storedSessionFlights.flights.Quotes.length; i++) {
             if (quoteId === storedSessionFlights.flights.Quotes[i].QuoteId && 
@@ -70,8 +90,9 @@ function saveFlightData(quoteId, originId, destinationId, flightType) {
         }
     } else if (flightType === "return-flight-quote-results") {
         flightType = "returnFlight";
-
-         // Loop through return flights and determine if we have a match
+        parentElement = returnFlightQuoteResultsE1;
+        
+        // Loop through return flights and determine if we have a match
         for (let i = 0; i < storedSessionFlights.returnFlights.Quotes.length; i++) {
             if (quoteId === storedSessionFlights.returnFlights.Quotes[i].QuoteId && 
                 originId === storedSessionFlights.returnFlights.Quotes[i].OutboundLeg.OriginId && 
@@ -86,7 +107,7 @@ function saveFlightData(quoteId, originId, destinationId, flightType) {
 
     // Verify that we did get a flight match
     if (!flightType || !flightDetails?.QuoteId) {
-        alert('Unable to save flight data. 2'); // Take out after testing
+        // alert('Unable to save flight data. 2'); // Take out after testing
         console.log({ error: "No session flights were found." });
         // TODO: Somehow alert the user that we were unable to save the flight
         //
@@ -104,7 +125,7 @@ function saveFlightData(quoteId, originId, destinationId, flightType) {
     }));
 
     // Re-render flights
-    // renderFlightList();
+    renderFlightList(parentElement, {});
 }
 
 // Get Saved Flight Data in Session Storage
@@ -122,6 +143,9 @@ function saveReturnedFlightData(flights, returnFlights) {
 
 // Render flights
 function renderFlightList(parentElement, searchParams) {
+    // set the innerHTML for the current container to nothing.
+    parentElement.innerHTML = "";
+
     // Get session flights
     let flights = getSessionFlightData(); 
 
@@ -136,15 +160,12 @@ function renderFlightList(parentElement, searchParams) {
         console.log({ error: 'Unable to determine flight type.'} );
     }
 
-
-    // set the innerHTML for the current container to nothing.
-    parentElement.innerHTML = "";
-
     // Create flight quote details headings div
     let flightQuoteDetailsHeader = document.createElement('div');
-    flightQuoteDetailsHeader.innerHTML = `
-            <h3>${searchParams.origin} -> ${searchParams.destination}</h3>
-        `;
+    // flightQuoteDetailsHeader.innerHTML = `
+    //         <h3>${searchParams.origin} -> ${searchParams.destination}</h3>
+    //     `;
+    flightQuoteDetailsHeader.innerHTML = '';
 
     // Create div element for flight list
     let flightList = document.createElement("div");
@@ -264,7 +285,7 @@ function compileFlightQuoteCard(flightDetails, flightType) {
     quoteCard.innerHTML = `
         <div class="card-content">
             <div class="content">
-                <h2>${flightDetails.searchParams.origin} > ${flightDetails.searchParams.destination}</h2>
+                <h2>${flightDetails.originPlaceDetails.IataCode} > ${flightDetails.destinationPlaceDetails.IataCode}</h2>
                 <h4>${flightDetails.carrierNameList[0]}</h4>
                 <hr />
                 <p>Flight Origin: ${flightDetails.originPlaceDetails.CityName} (${flightDetails.originPlaceDetails.IataCode})</p>
