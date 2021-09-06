@@ -10,36 +10,81 @@
     <title>Eventful Trip</title>
 </head>
 <body>
-    <section class="hero is-fullheight">
-            <div class="header is-overlay has-text-centered">
-                <h1 class="title is-1">Plan your eventful trip</h1>
-                <h2 class="subtitle is-4 has-text-primary">Real time events and flight</h2>
-                    <div class="columns is-centered is-vcentered is-desktop"> 
-                        <div class="column is-narrow">
-                            <input id="origin-input" class="input is-primary is-normal" type="text" placeholder="From">
-                        </div>
-                        <div class="column is-narrow">
-                            <input id="departure-date" class="input is-primary" type="date" placeholder="Dept. Date" />
-                            <!-- <button class="button is-primary" type="submit">Departure Date<i class="far fa-calendar-alt"></i></button> -->
-                        </div>
-                        <div class="column is-narrow">
-                            <input id="destination-input" class="input is-primary is-normal"type="text" placeholder="Destination">
-                        </div>
-                        <div class="column is-narrow">
-                            <input id="return-date" class="input is-primary" type="date" placeholder="Return Date" />
-                            <!-- <button  class="button is-primary" type="submit">Return Date<i class="far fa-calendar-alt"></i></button> -->
-                        </div>
-                        <!-- <div class="column is-narrow">
-                            <input id="passengers" class="input is-primary is-normal"type="text" placeholder="# of passengers">
-                        </div> -->
-                        <div class="column is-narrow">
-                            <button  id="flight-search-button" class="button is-primary">Search</button>
-                        </div>
-                    </div>
 
-            
+    <section class="hero is-primary is-medium">
+        <div class="hero-head">
+        <nav class="navbar">
+          <div class="container">
+            <div class="navbar-brand">
+              <a class="navbar-item">
+                <h2>FlightPlan</h2>
+              </a>
+              <span class="navbar-burger" data-target="navbarMenuHeroA">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
             </div>
+            <div id="navbarMenuHeroA" class="navbar-menu">
+              <div class="navbar-end">
+                <a class="navbar-item is-active">
+                  Flight Search
+                </a>
+                <a class="navbar-item">
+                  My Planned Trips
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+      
+        <!-- Hero content: will be in the middle -->
+        <div class="hero-body">
+          <div class="container has-text-centered">
+            <p class="title">
+              Plan your eventful trip
+            </p>
+            <p class="subtitle">
+              Blah Blah Blah Blah
+            </p>
+          </div>
+          <div class="columns is-centered is-vcentered is-desktop"> 
+            <div class="column is-narrow">
+                <input id="origin-input" class="input is-primary is-normal" type="text" placeholder="From">
+            </div>
+            <div class="column is-narrow">
+                <input id="departure-date" class="input is-primary" type="date" placeholder="Dept. Date" />
+                <!-- <button class="button is-primary" type="submit">Departure Date<i class="far fa-calendar-alt"></i></button> -->
+            </div>
+            <div class="column is-narrow">
+                <input id="destination-input" class="input is-primary is-normal"type="text" placeholder="Destination">
+            </div>
+            <div class="column is-narrow">
+                <input id="return-date" class="input is-primary" type="date" placeholder="Return Date" />
+                <!-- <button  class="button is-primary" type="submit">Return Date<i class="far fa-calendar-alt"></i></button> -->
+            </div>
+            <!-- <div class="column is-narrow">
+                <input id="passengers" class="input is-primary is-normal"type="text" placeholder="# of passengers">
+            </div> -->
+            <div class="column is-narrow">
+                <button  id="flight-search-button" class="button is-primary">Search</button>
+            </div>
+        </div>
     </section>
+
+    <h2>Flights</h2>
+    <hr />
+    <div id="flight-quote-results">
+        <h2>No found flights. Please complete the form above to search for flights.</h2>
+    </div>
+    <div id="return-flight-quote-results">
+
+    </div>
+
+    <h2>Local Events at Destination</h2>
+    <hr />
+
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
