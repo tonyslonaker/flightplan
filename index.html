@@ -89,33 +89,32 @@
     </section>
 
     <section class="event-section">
-        <div class="content-container">
-            <h4 class="title is-4">Events</h4>
-            <div class="input-field">
-                <select multiple id='filter'>
-                </select>
+        <div class="eventTable content-container">
+            <h4 id="goToEvents">Events</h4>
+            <field>
                 <label>Event Category Filter</label>
+                <control>
+                <input class="input-field">
+                    <select class="category-dropdown is-up is hoverable" multiple id='filter'>
+                    </select>
+                </control>
+            </field>
+                <div class="container">
+                    <table class="responsive-table is-hovered" id="eventsTable">
+                        <thead>
+                            <tr class="eventHeading">
+                                <td>Event Name</td>
+                                <td>Category</td>
+                                <td>Date/Time</td>
+                                <td>Price ($)</td>
+                                <td>More Info</td>
+                            </tr>
+                        </thead>
+                        <tbody id="events">
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="table-container">
-                <table class="responsive-table is-fullwidth is-bordered" id="eventsTable">
-                    <thead>
-                        <tr class="eventHeading">
-                            <td>Event Name</td>
-                            <br>
-                            <td>Category</td>
-                            <br>
-                            <td>Date/Time</td>
-                            <br>
-                            <td>Price ($)</td>
-                            <br>
-                            <td>More Info</td>
-                        </tr>
-                    </thead>
-                    <tbody id="events">
-                    </tbody>
-                </table>
-            </div>
-        </div>
     </section>
 
     <!-- My Planned Trip Modal -->
@@ -129,20 +128,20 @@
 
               </div>
             </div>
-            <button class="modal-close is-large" onClick="closePlannedTripModal()" aria-label="close"></button>
+            <button class="modal-close is-large is-focused" onClick="closePlannedTripModal()" aria-label="close"></button>
         </div>
 
     <!-- maybe the events trip modal -->
-        <div class="modal" id="planned-event-modal">
+        <div class='modal' id="planned-event-modal">
             <div class="modal-background"></div>
             <div class="modal-content">
-              <h4>My Planned Event Modal</h4>
-              <hr />
-              <div id="planned-event-modal-content-container">
+                <h4>My Planned Event Modal</h4>
+                <hr />
+                <div id="planned-event-modal-content-container">
 
-              </div>
+                </div>
             </div>
-            <button class="modal-close is-large" onClick="closePlannedEventModal()" aria-label="close"></button>
+                <button class="modal-close is-large is-focused" onClick="closePlannedEventModal()" aria-label="close"></button>
         </div>
 
     <!-- Scripts -->

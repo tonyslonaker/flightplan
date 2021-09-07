@@ -3,9 +3,12 @@ let flightQuoteResultsE1 = document.getElementById('flight-quote-results');
 let returnFlightQuoteResultsE1 = document.getElementById('return-flight-quote-results');
 let plannedTripModalE1 = document.getElementById('planned-trip-modal');
 let plannedTripModalContentE1 = document.getElementById('planned-trip-modal-content-container');
-let eventStartDateSearch = document.getElementById('#departure_date');
-let eventEndDateSearch = document.getElementById('#return_date');
-let eventDestination = document.getElementById('#destination_input')
+let plannedEventModalEl = document.getElementById('planned-event-modal');
+let plannedEventModalContentEl = document.getElementById('planned-event-modal-content-container');
+let eventStartDateSearch = document.getElementById('departure_date');
+let eventEndDateSearch = document.getElementById('return_date');
+let eventDestination = document.getElementById('destination_input');
+let eventsContainer = document.getElementById('events-container');
 
 // Open planned trip modal
 function openPlannedTripModal() {
@@ -358,20 +361,51 @@ async function searchFlightsAndEvents(event) {
     // Search Events? 
 }
 
+// Open planned trip modal
+function openPlannedEventModal() {
+    let plannedEvent = getPlannedEventInformation();
+
+    plannedEventModalE1.className = "modal is-active";
+
+    plannedEventModalContentE1.innerHTML = JSON.stringify(plannedTrip);
+    
+}
+
+// Open planned event modal
+function openPlannedEventModal() {
+    let plannedEvent = getPlannedEventInformation();
+
+    plannedEventModalEl.className = "modal is-active";
+
+    plannedEventModalContentEl.innerHTML = JSON.stringify(plannedEvent);
+    
+}
+
+// Close planned event modal
+function closePlannedTripModal() {
+    plannedTripModalE1.className = "modal";
+}
+
+// Get planned event information from local storage
+function getPlannedEventInformation() {
+    const plannedEvent = JSON.parse(localStorage.getItem("plannedEvent")) || {};
+
+    return plannedEvent;
+}
+
 // call eventBrite API
 async function callEventBriteAPI() {
     
-    url = "https://www.eventbriteapi.com/v3/users/me/?token=YENZAWNHDK56II2POHDS";
+    let url = "https://www.eventbriteapi.com/v3/events/search/?token=YENZAWNHDK56II2POHDS";
 
     let params = {
-        method: 'GET',
-        headers: {
-            Authorization: "Bearer YENZAWNHDK56II2POHDS",
-
-        }
-        
+        method: "GET",
+        Authorization: "Bearer YENZAWNHDK56II2POHDS",
+ 
     }
 }
 
-flightSearchFormE1.addEventListener("click", searchFlightsAndEvents);
 
+
+
+flightSearchFormE1.addEventListener("click", searchFlightsAndEvents);
