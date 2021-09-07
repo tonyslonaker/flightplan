@@ -323,49 +323,19 @@ async function callSkyScannerAPI(origin, destination, takeOffDate) {
 }
 
 // call eventBrite API
-async function callEventBriteAPI(destination, startDate, endDate) {
-    startDate = moment(startDate).format("YYYY-MM-DDThh:mm:ss");
-    endDate = moment(endDate).format("YYYY-MM-DDThh:mm:ss");
+async function callEventBriteAPI() {
     
-    var queryURL = `https://www.eventbrite.com/v3/events/search?start_date.range_start=${startDate}&start_date.range_end=${endDate}&location.address=${destination}&page=${pageNo}`;
+    url = "https://www.eventbrite.com/v3/events/search?start_date.range_start=${startDate}&start_date.end=${endDate}&location.address=${destination}&page=${pageNo}";
 
-    $.ajax({
-        url: queryURL,
-        method: "GET",
-        beforeSend: function (request) {
-            request.withCredentials = true;
-            request.setRequestHeader("Authorization", "Bearer YENZAWNHDK56II2POHDS");
-        },
-    }).then(function (response) {
+    let params = {
+        method: 'GET',
+        headers: {
+            Authorization: "Bearer YENZAWNHDK56II2POHDS",
 
-        if (response.events.length === 0) {
-            $('#modalEvents').modal('open');
-            $('#moreEvents').hide();
         }
-        for (i = 0; i < response.events.length; i++) {
-            events.push(response.events[i]);
-        }
-        buildTable(events);
-        events = [];
-    });
-}
-
-function buildTable(events) {
-    for (x in events) {  // for each element in the events array
-        var data = events[x]; //Set data to current element interval.
-        var newTR = $(`<tr data-category='${data.category_id}'>`);
-        newTR.append(`<td>${data.name.text}</td>`)
-            .append(`<td >${(data.category_id === null) ? 'None' : categories[data.category_id]}`)
-            .append(`<td>${moment(data.start.local).format("MM/DD/YYYY h:mm a")}</td>`) //Formats date/time
-            .append(`<td>${data.is_free ? 'Free!' : 'Not Free!'}</td>`) //Terniary operator, outputs based on is_free boolean.
-            .append(`<td><a href='${data.url}' target="_blank">More Info</a>`); //URL to the eventbrite page.
-        $("#events").append(newTR);
+        
     }
-    $("#filter").trigger("change");
-    $("#eventsTable").trigger("update");
-    $(".loadingBar").hide();
 }
-
 
 
 
