@@ -3,9 +3,9 @@ let flightQuoteResultsE1 = document.getElementById('flight-quote-results');
 let returnFlightQuoteResultsE1 = document.getElementById('return-flight-quote-results');
 let plannedTripModalE1 = document.getElementById('planned-trip-modal');
 let plannedTripModalContentE1 = document.getElementById('planned-trip-modal-content-container');
-var pageNo = 1;
-var pageCount;
-var events = [];
+let eventStartDateSearch = document.getElementById('#departure_date');
+let eventEndDateSearch = document.getElementById('#return_date');
+let eventDestination = document.getElementById('#destination_input')
 
 // Open planned trip modal
 function openPlannedTripModal() {
@@ -322,23 +322,6 @@ async function callSkyScannerAPI(origin, destination, takeOffDate) {
     .catch(error => console.log('error', error));
 }
 
-// call eventBrite API
-async function callEventBriteAPI() {
-    
-    url = "https://www.eventbrite.com/v3/events/search?start_date.range_start=${startDate}&start_date.end=${endDate}&location.address=${destination}&page=${pageNo}";
-
-    let params = {
-        method: 'GET',
-        headers: {
-            Authorization: "Bearer YENZAWNHDK56II2POHDS",
-
-        }
-        
-    }
-}
-
-
-
 // Search flights and events
 async function searchFlightsAndEvents(event) {
     event.preventDefault();
@@ -373,8 +356,21 @@ async function searchFlightsAndEvents(event) {
     });
 
     // Search Events? 
-    //
-    //
+}
+
+// call eventBrite API
+async function callEventBriteAPI() {
+    
+    url = "https://www.eventbriteapi.com/v3/users/me/?token=YENZAWNHDK56II2POHDS";
+
+    let params = {
+        method: 'GET',
+        headers: {
+            Authorization: "Bearer YENZAWNHDK56II2POHDS",
+
+        }
+        
+    }
 }
 
 flightSearchFormE1.addEventListener("click", searchFlightsAndEvents);
