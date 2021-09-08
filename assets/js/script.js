@@ -10,8 +10,34 @@ function openPlannedTripModal() {
 
     plannedTripModalE1.className = "modal is-active";
 
-    plannedTripModalContentE1.innerHTML = JSON.stringify(plannedTrip);
+    // plannedTripModalContentE1.innerHTML = JSON.stringify(plannedTrip);
+    plannedTripModalContentE1.innerHTML = `
+    <div id="planned-trip-modal-content">
+        <div class="planned-trip-section" id="planned-flights">
+            <div class="title is-4">Flight Information</div>
+            <hr />
+            <div id="planned-flight-list">
+                <div class="title is-5">Outbound Flight</div>
+                <p>${JSON.stringify(plannedTrip.outboundFlight)}</p>
+                <div class="title is-5">Return Flight</div>
+                <p>${JSON.stringify(plannedTrip.returnFlight)}</p>
+            </div>
+        </div>
+        <div class="planned-trip-section" id="planned-events">
+            <div class="title is-4">Planned Events</div>
+            <hr />
+            <div id="planned-event-list">
+                <p>Display saved events here....</p>
+            </div>
+        </div>
+    </div>
+    `;
     
+}
+
+// Clear planned trip from local storage
+function clearPlannedTrip() {
+    localStorage.removeItem('plannedTrip');
 }
 
 // Close planned trip modal
@@ -146,7 +172,7 @@ function renderFlightList(parentElement, searchParams) {
     // set the innerHTML for the current container to nothing.
     parentElement.innerHTML = "";
 
-    // Get session flights
+    // Get stored session flights flights: {flights, returnedFlights}
     let flights = getSessionFlightData(); 
 
     // Determine which type we want to render - Outbound/Return flights
@@ -161,11 +187,11 @@ function renderFlightList(parentElement, searchParams) {
     }
 
     // Create flight quote details headings div
-    let flightQuoteDetailsHeader = document.createElement('div');
+    // let flightQuoteDetailsHeader = document.createElement('div');
     // flightQuoteDetailsHeader.innerHTML = `
     //         <h3>${searchParams.origin} -> ${searchParams.destination}</h3>
     //     `;
-    flightQuoteDetailsHeader.innerHTML = '';
+    // flightQuoteDetailsHeader.innerHTML = '';
 
     // Create div element for flight list
     let flightList = document.createElement("div");
@@ -227,7 +253,7 @@ function renderFlightList(parentElement, searchParams) {
     }
 
     // Append the flight quote details headings
-    parentElement.appendChild(flightQuoteDetailsHeader);
+    // parentElement.appendChild(flightQuoteDetailsHeader);
     // Append the list of flight quote cards
     parentElement.appendChild(flightList);
 }
@@ -337,20 +363,20 @@ async function searchFlightsAndEvents(event) {
     
     // Save flights in session storage
     saveReturnedFlightData(JSON.parse(flightResults), JSON.parse(returnFlightResults));
-    
-    renderFlightList(flightQuoteResultsE1, {
-        origin,
-        destination,
-        departDate,
-        returnDate
-    });
 
-    renderFlightList(returnFlightQuoteResultsE1, {
+    // Create searchParams object to pass into render function
+    let searchParams = {
         origin,
         destination,
         departDate,
         returnDate
-    });
+    }
+    
+    // Render outbound flights on UI
+    renderFlightList(flightQuoteResultsE1, searchParams);
+
+    // Render return flights on UI
+    renderFlightList(returnFlightQuoteResultsE1, searchParams);
 
     // Search Events? 
     //
