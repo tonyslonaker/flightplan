@@ -378,9 +378,25 @@ async function searchFlightsAndEvents(event) {
     // Render return flights on UI
     renderFlightList(returnFlightQuoteResultsE1, searchParams);
 
-    // Search Events? 
-    //
-    //
+    // Search Hotels? 
+    async function callHotelAPI(response) {
+        let url = "https://booking-com.p.rapidapi.com/v1/metadata/exchange-rates?currency=AED&locale=en-gb";
+
+        let params = {
+            method: 'GET',
+            headers: {
+                'x-rapidapi-host': 'booking-com.p.rapidapi.com',
+                'x-rapidapi-key': '985c5a5a52msh5e525b5f3d5f2adp1c9239jsn6cfdc252f604'
+            },
+            redirect: 'follow'
+        }
+        
+    };
+        console.log(response)
+    return await fetch(url, params)
+    .then(response => response.text())
+    .then(searchFlightsAndEvents => searchFlightsAndEvents)
+    .catch(error => console.log('error', error));
 }
 
 flightSearchFormE1.addEventListener("click", searchFlightsAndEvents);
