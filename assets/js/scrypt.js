@@ -361,17 +361,7 @@ async function searchFlightsAndEvents(event) {
     // Search Events? 
 }
 
-// Open planned trip modal
-function openPlannedEventModal() {
-    let plannedEvent = getPlannedEventInformation();
-
-    plannedEventModalE1.className = "modal is-active";
-
-    plannedEventModalContentE1.innerHTML = JSON.stringify(plannedTrip);
-    
-}
-
-// Open planned event modal
+// Open planned Event modal
 function openPlannedEventModal() {
     let plannedEvent = getPlannedEventInformation();
 
@@ -381,9 +371,10 @@ function openPlannedEventModal() {
     
 }
 
-// Close planned event modal
-function closePlannedTripModal() {
-    plannedTripModalE1.className = "modal";
+
+// Close planned Event modal
+function closePlannedEventModal() {
+    plannedEventModalEl.className = "modal";
 }
 
 // Get planned event information from local storage
@@ -393,17 +384,28 @@ function getPlannedEventInformation() {
     return plannedEvent;
 }
 
-// call eventBrite API
-async function callEventBriteAPI() {
-    
-    let url = "https://www.eventbriteapi.com/v3/events/search/?token=YENZAWNHDK56II2POHDS";
 
-    let params = {
-        method: "GET",
-        Authorization: "Bearer YENZAWNHDK56II2POHDS",
- 
-    }
+async function callEventBriteAPI() {
+
+    let url = 'https://www.eventbriteapi.com/v3/categories/';
+
+        let params = { 
+            method: 'GET', 
+            object: 'category_list',
+            headers: {
+                Key: 'XNA4KEFKZNDI4JA7LP',
+                Authorization: 'Bearer YENZAWNHDK56II2POHDS', 
+            }
+            
+        };
+        return await callEventBriteAPI(response)
+        .then(response => response.text())
+        .then([departDate, destination, returnDate])
+
+
 }
+
+
 
 
 
