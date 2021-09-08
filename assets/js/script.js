@@ -4,12 +4,34 @@ let returnFlightQuoteResultsE1 = document.getElementById('return-flight-quote-re
 let plannedTripModalE1 = document.getElementById('planned-trip-modal');
 let plannedTripModalContentE1 = document.getElementById('planned-trip-modal-content-container');
 
-// Open planned trip modal
-function openPlannedTripModal() {
+// Create My Planned Trip modal content
+function createMyPlannedTripModalContent() {
     let plannedTrip = getPlannedTripInformation();
 
-    plannedTripModalE1.className = "modal is-active";
+    // Outbound flight html
+    let outboundFlightHTML = `<p>No saved outbound flight</p>`;
+    if (plannedTrip?.outboundFlight?.QuoteId) {
+        outboundFlightHTML = `
+            <p>Departure Date: ${moment(plannedTrip.outboundFlight.OutboundLeg).format('MM/DD/YYYY')}</p>
+            <p>Carrier: ${plannedTrip.outboundFlight.carrierName}</p>
+            <p>Origin: ${plannedTrip.outboundFlight.originIata}</p>
+            <p>Destination: ${plannedTrip.outboundFlight.destinationIata}</p>
+            <button class="button is-danger" onClick="removeSavedFlight('flight-quote-results', 'modal')">Remove Flight</button>
+        `;
+    }
 
+    // Return flight html
+    let returnFlightHTML = `<p>No saved return flight</p>`;
+    if (plannedTrip?.returnFlight?.QuoteId) {
+        returnFlightHTML = `
+            <p>Departure Date: ${moment(plannedTrip.returnFlight.OutboundLeg).format('MM/DD/YYYY')}</p>
+            <p>Carrier: ${plannedTrip.returnFlight.carrierName}</p>
+            <p>Origin: ${plannedTrip.returnFlight.originIata}</p>
+            <p>Destination: ${plannedTrip.returnFlight.destinationIata}</p>
+            <button class="button is-danger" onClick="removeSavedFlight('return-flight-quote-results', 'modal')">Remove Flight</button>
+        `;
+    }
+    
     // plannedTripModalContentE1.innerHTML = JSON.stringify(plannedTrip);
     plannedTripModalContentE1.innerHTML = `
     <div id="planned-trip-modal-content">
@@ -17,15 +39,14 @@ function openPlannedTripModal() {
             <div class="title is-4">Flight Information</div>
             <hr />
             <div id="planned-flight-list">
-                <div class="title is-5">Outbound Flight</div>
-                <p></p>
-                <p>${JSON.stringify(plannedTrip.outboundFlight)}</p>
-                <div class="title is-5">Return Flight</div>
-                <p>${JSON.stringify(plannedTrip.returnFlight)}</p>
+                <div class="title is-5 mb-1">Outbound Flight</div>
+                ${outboundFlightHTML}
+                <div class="title is-5 mb-1 mt-3">Return Flight</div>
+                ${returnFlightHTML}
             </div>
         </div>
         <div class="planned-trip-section" id="planned-hotel">
-            <div class="title is-4">Selected Hotel</div>
+            <div class="title is-4 mt-4">Selected Hotel</div>
             <hr />
             <div id="planned-hotels-list">
                 <p>Display saved hotel details here....</p>
@@ -33,7 +54,14 @@ function openPlannedTripModal() {
         </div>
     </div>
     `;
-    
+}
+
+// Open planned trip modal
+function openPlannedTripModal() {
+    plannedTripModalE1.className = "modal is-active";
+
+    // Set modal content
+    createMyPlannedTripModalContent();
 }
 
 // Close planned trip modal
@@ -44,7 +72,13 @@ function closePlannedTripModal() {
 // Clear planned trip from local storage
 function clearPlannedTrip() {
     localStorage.removeItem('plannedTrip');
+    refreshPlannedTripModal();
+}
+
+// Refresh modal
+function refreshPlannedTripModal() {
     closePlannedTripModal();
+    openPlannedTripModal();
 }
 
 // Get planned trip information from local storage
@@ -55,7 +89,7 @@ function getPlannedTripInformation() {
 }
 
 // Remove saved flight
-function removeSavedFlight(flightType) {
+function removeSavedFlight(flightType, source) {
     let plannedTrip = getPlannedTripInformation();
     let parentElement;
 
@@ -76,11 +110,16 @@ function removeSavedFlight(flightType) {
         [flightType]: {}
     }));
 
+    // If source click was from My Planned Trip modal, refresh the modal
+    if (source === "modal") {
+        refreshPlannedTripModal();
+    }
+
     renderFlightList(parentElement, {});
 }
 
 // Save flight information in local storage
-function saveFlightData(quoteId, originId, destinationId, flightType) {
+function saveFlightData(quoteId, originId, destinationId, flightType, carrierName, originIata, destinationIata) {
     // alert(JSON.stringify({
     //     quoteId, 
     //     originId,
@@ -148,7 +187,10 @@ function saveFlightData(quoteId, originId, destinationId, flightType) {
     localStorage.setItem("plannedTrip", JSON.stringify({
         ...plannedTrip,
         [flightType]: {
-            ...flightDetails // Store new flight details
+            ...flightDetails, // Store new flight details
+            carrierName,
+            originIata,
+            destinationIata
         }
     }));
 
@@ -187,13 +229,6 @@ function renderFlightList(parentElement, searchParams) {
     } else {
         console.log({ error: 'Unable to determine flight type.'} );
     }
-
-    // Create flight quote details headings div
-    // let flightQuoteDetailsHeader = document.createElement('div');
-    // flightQuoteDetailsHeader.innerHTML = `
-    //         <h3>${searchParams.origin} -> ${searchParams.destination}</h3>
-    //     `;
-    // flightQuoteDetailsHeader.innerHTML = '';
 
     // Create div element for flight list
     let flightList = document.createElement("div");
@@ -254,8 +289,6 @@ function renderFlightList(parentElement, searchParams) {
         `;
     }
 
-    // Append the flight quote details headings
-    // parentElement.appendChild(flightQuoteDetailsHeader);
     // Append the list of flight quote cards
     parentElement.appendChild(flightList);
 }
@@ -302,7 +335,7 @@ function matchAgainstSavedFlights(flightType, quoteId, originId, destinationId) 
 function compileFlightQuoteCard(flightDetails, flightType) {
     // Check if we have saved this flight
     let matchedFlight = matchAgainstSavedFlights(flightType, flightDetails.QuoteId, flightDetails.OutboundLeg.OriginId, flightDetails.OutboundLeg.DestinationId);
-    let button = `<button class="button is-success" id="${flightDetails.QuoteId}-${flightDetails.OutboundLeg.OriginId}-${flightDetails.OutboundLeg.DestinationId}" onClick="saveFlightData(${flightDetails.QuoteId}, ${flightDetails.OutboundLeg.OriginId}, ${flightDetails.OutboundLeg.DestinationId}, '${flightType}')">Save Flight</button>`;
+    let button = `<button class="button is-success" id="${flightDetails.QuoteId}-${flightDetails.OutboundLeg.OriginId}-${flightDetails.OutboundLeg.DestinationId}" onClick="saveFlightData(${flightDetails.QuoteId}, ${flightDetails.OutboundLeg.OriginId}, ${flightDetails.OutboundLeg.DestinationId}, '${flightType}', '${flightDetails.carrierNameList[0]}', '${flightDetails.originPlaceDetails.IataCode}', '${flightDetails.destinationPlaceDetails.IataCode}')">Save Flight</button>`;
     if (matchedFlight) {
         button = `<button class="button is-danger" id="${flightDetails.QuoteId}-${flightDetails.OutboundLeg.OriginId}-${flightDetails.OutboundLeg.DestinationId}" onClick="removeSavedFlight('${flightType}')">Remove Saved Flight</button>`;
     }
