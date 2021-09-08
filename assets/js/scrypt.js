@@ -32,7 +32,7 @@ function openPlannedTripModal() {
         </div>
     </div>
     `;
-    
+
 }
 
 // Clear planned trip from local storage
@@ -58,7 +58,7 @@ function removeSavedFlight(flightType) {
     let parentElement;
 
     if (flightType === "flight-quote-results") {
-        flightType = "outboundFlight"; 
+        flightType = "outboundFlight";
         parentElement = flightQuoteResultsE1;
     } else if (flightType === "return-flight-quote-results") {
         flightType = "returnFlight";
@@ -108,23 +108,23 @@ function saveFlightData(quoteId, originId, destinationId, flightType) {
         parentElement = flightQuoteResultsE1;
         // Loop through outbound flights and determine if we have a match
         for (let i = 0; i < storedSessionFlights.flights.Quotes.length; i++) {
-            if (quoteId === storedSessionFlights.flights.Quotes[i].QuoteId && 
-                originId === storedSessionFlights.flights.Quotes[i].OutboundLeg.OriginId && 
+            if (quoteId === storedSessionFlights.flights.Quotes[i].QuoteId &&
+                originId === storedSessionFlights.flights.Quotes[i].OutboundLeg.OriginId &&
                 destinationId === storedSessionFlights.flights.Quotes[i].OutboundLeg.DestinationId) {
-                    flightDetails = storedSessionFlights.flights.Quotes[i];
-                }
+                flightDetails = storedSessionFlights.flights.Quotes[i];
+            }
         }
     } else if (flightType === "return-flight-quote-results") {
         flightType = "returnFlight";
         parentElement = returnFlightQuoteResultsE1;
-        
+
         // Loop through return flights and determine if we have a match
         for (let i = 0; i < storedSessionFlights.returnFlights.Quotes.length; i++) {
-            if (quoteId === storedSessionFlights.returnFlights.Quotes[i].QuoteId && 
-                originId === storedSessionFlights.returnFlights.Quotes[i].OutboundLeg.OriginId && 
+            if (quoteId === storedSessionFlights.returnFlights.Quotes[i].QuoteId &&
+                originId === storedSessionFlights.returnFlights.Quotes[i].OutboundLeg.OriginId &&
                 destinationId === storedSessionFlights.returnFlights.Quotes[i].OutboundLeg.DestinationId) {
-                    flightDetails = storedSessionFlights.returnFlights.Quotes[i]
-                }
+                flightDetails = storedSessionFlights.returnFlights.Quotes[i]
+            }
         }
     } else {
         console.log({ error: "Unable to save flight." })
@@ -162,7 +162,7 @@ function getSessionFlightData() {
 // Save Returned Flight Data in Session Storage
 function saveReturnedFlightData(flights, returnFlights) {
     sessionStorage.setItem("returnedFlights", JSON.stringify({
-        flights, 
+        flights,
         returnFlights
     }));
 }
@@ -173,7 +173,7 @@ function renderFlightList(parentElement, searchParams) {
     parentElement.innerHTML = "";
 
     // Get stored session flights flights: {flights, returnedFlights}
-    let flights = getSessionFlightData(); 
+    let flights = getSessionFlightData();
 
     // Determine which type we want to render - Outbound/Return flights
     if (parentElement.id == "flight-quote-results") {
@@ -183,7 +183,7 @@ function renderFlightList(parentElement, searchParams) {
         // Get return flights
         flights = flights.returnFlights;
     } else {
-        console.log({ error: 'Unable to determine flight type.'} );
+        console.log({ error: 'Unable to determine flight type.' });
     }
 
     // Create flight quote details headings div
@@ -200,7 +200,7 @@ function renderFlightList(parentElement, searchParams) {
     // Check if flights have quotes array
     if (flights?.Quotes) {
         for (let i = 0; i < flights.Quotes.length; i++) {
-            
+
             // loop through quote carrier IDs and get a resolve to carrier names
             let carrierNameList = [];
             if (flights.Quotes[i]?.OutboundLeg?.CarrierIds) {
@@ -277,7 +277,7 @@ function matchAgainstSavedFlights(flightType, quoteId, originId, destinationId) 
         // Get return flight details
         flightDetails = plannedTrip.returnFlight;
     } else {
-        console.log({ error: 'Unable to determine flight type.'} );
+        console.log({ error: 'Unable to determine flight type.' });
         return match;
     }
 
@@ -287,13 +287,13 @@ function matchAgainstSavedFlights(flightType, quoteId, originId, destinationId) 
     }
 
     // Check if it is a match
-    if (flightDetails.QuoteId === quoteId && 
-        flightDetails.OutboundLeg.OriginId === originId && 
+    if (flightDetails.QuoteId === quoteId &&
+        flightDetails.OutboundLeg.OriginId === originId &&
         flightDetails.OutboundLeg.DestinationId === destinationId) {
-            match = true;
-        }  
+        match = true;
+    }
 
-    return match; 
+    return match;
 }
 
 // Compile Flight Quote Card
@@ -324,7 +324,7 @@ function compileFlightQuoteCard(flightDetails, flightType) {
         </div>
     `;
     return quoteCard;
-} 
+}
 
 // Call Flight Quote API
 async function callSkyScannerAPI(origin, destination, takeOffDate) {
@@ -334,15 +334,15 @@ async function callSkyScannerAPI(origin, destination, takeOffDate) {
         method: 'GET',
         headers: {
             'x-rapidapi-host': 'skyscanner-skyscanner-flight-search-v1.p.rapidapi.com',
-            'x-rapidapi-key':  '1047be0014msh7da5d44202bb0e4p1ba9a6jsn68f71fe1abf0'
+            'x-rapidapi-key': '1047be0014msh7da5d44202bb0e4p1ba9a6jsn68f71fe1abf0'
         },
         redirect: 'follow'
     };
 
     return await fetch(url, params)
-    .then(response => response.text())
-    .then(flightQuoteResults => flightQuoteResults)
-    .catch(error => console.log('error', error));
+        .then(response => response.text())
+        .then(flightQuoteResults => flightQuoteResults)
+        .catch(error => console.log('error', error));
 }
 
 // Search flights and events
@@ -360,7 +360,7 @@ async function searchFlightsAndEvents(event) {
 
     // Second flight search - From destination back to origin
     let returnFlightResults = await callSkyScannerAPI(destination, origin, returnDate);
-    
+
     // Save flights in session storage
     saveReturnedFlightData(JSON.parse(flightResults), JSON.parse(returnFlightResults));
 
@@ -371,32 +371,33 @@ async function searchFlightsAndEvents(event) {
         departDate,
         returnDate
     }
-    
+
     // Render outbound flights on UI
     renderFlightList(flightQuoteResultsE1, searchParams);
 
     // Render return flights on UI
     renderFlightList(returnFlightQuoteResultsE1, searchParams);
 
-    // Search Hotels? 
-    async function callHotelAPI(response) {
-        let url = "https://booking-com.p.rapidapi.com/v1/metadata/exchange-rates?currency=AED&locale=en-gb";
+    // Search Hotels?
 
-        let params = {
-            method: 'GET',
-            headers: {
-                'x-rapidapi-host': 'booking-com.p.rapidapi.com',
-                'x-rapidapi-key': '985c5a5a52msh5e525b5f3d5f2adp1c9239jsn6cfdc252f604'
-            },
-            redirect: 'follow'
+}
+
+async function callHotelApi() {
+
+    fetch("https://booking-com.p.rapidapi.com/v1/hotels/search?units=metric&order_by=popularity&checkin_date=2021-11-25&filter_by_currency=AED&adults_number=2&checkout_date=2021-11-26&dest_id=-553173&locale=en-gb&dest_type=city&room_number=1&children_ages=5%2C0&page_number=0&categories_filter_ids=facility%3A%3A107%2Cfree_cancellation%3A%3A1&children_number=2", {
+        "method": "GET",
+        "headers": {
+            "x-rapidapi-host": "booking-com.p.rapidapi.com",
+            "x-rapidapi-key": "985c5a5a52msh5e525b5f3d5f2adp1c9239jsn6cfdc252f604"
         }
-        
-    };
-        console.log(response)
-    return await fetch(url, params)
-    .then(response => response.text())
-    .then(searchFlightsAndEvents => searchFlightsAndEvents)
-    .catch(error => console.log('error', error));
+    })
+        .then(response => {
+            console.log(response);
+        })
+        .catch(err => {
+            console.error(err);
+        });
+
 }
 
 flightSearchFormE1.addEventListener("click", searchFlightsAndEvents);
