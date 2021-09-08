@@ -18,16 +18,17 @@ function openPlannedTripModal() {
             <hr />
             <div id="planned-flight-list">
                 <div class="title is-5">Outbound Flight</div>
+                <p></p>
                 <p>${JSON.stringify(plannedTrip.outboundFlight)}</p>
                 <div class="title is-5">Return Flight</div>
                 <p>${JSON.stringify(plannedTrip.returnFlight)}</p>
             </div>
         </div>
-        <div class="planned-trip-section" id="planned-events">
-            <div class="title is-4">Planned Events</div>
+        <div class="planned-trip-section" id="planned-hotel">
+            <div class="title is-4">Selected Hotel</div>
             <hr />
-            <div id="planned-event-list">
-                <p>Display saved events here....</p>
+            <div id="planned-hotels-list">
+                <p>Display saved hotel details here....</p>
             </div>
         </div>
     </div>
@@ -35,14 +36,15 @@ function openPlannedTripModal() {
     
 }
 
-// Clear planned trip from local storage
-function clearPlannedTrip() {
-    localStorage.removeItem('plannedTrip');
-}
-
 // Close planned trip modal
 function closePlannedTripModal() {
     plannedTripModalE1.className = "modal";
+}
+
+// Clear planned trip from local storage
+function clearPlannedTrip() {
+    localStorage.removeItem('plannedTrip');
+    closePlannedTripModal();
 }
 
 // Get planned trip information from local storage
