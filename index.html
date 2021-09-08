@@ -4,29 +4,118 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
     <link rel="stylesheet" href="./assets/css/style.css">
-    <title>Document</title>
+    <title>Eventful Trip</title>
 </head>
-<header>
-    <h1>FLIGHTPLAN</h1>
-</header>
-
 <body>
 
-    <main>
-
-        <div>
-            <div>
-                <h2></h2>
+    <section class="hero is-primary is-medium">
+        <div class="hero-head">
+        <nav class="navbar">
+          <div class="container">
+            <div class="navbar-brand">
+              <a class="navbar-item">
+                <h2>TripPlanner</h2>
+              </a>
+              <span class="navbar-burger" data-target="navbarMenuHeroA">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </div>
+            <div id="navbarMenuHeroA" class="navbar-menu">
+              <div class="navbar-end">
+                <a class="navbar-item" id="my-planned-trip-link" onClick="openPlannedTripModal()">
+                  My Planned Trip
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+      
+        <!-- Hero content: will be in the middle -->
+        <div class="hero-body">
+          <div class="container has-text-centered">
+            <h2 class="title is-2">Plan your eventful trip</h2>
+            <p class="subtitle">
+              Blah Blah Blah Blah
+            </p>
+          </div>
+          <div class="columns is-centered is-vcentered is-desktop"> 
+            <div class="column is-narrow">
+                <input id="origin-input" class="input is-primary is-normal" type="text" placeholder="From">
+            </div>
+            <div class="column is-narrow">
+                <input id="departure-date" class="input is-primary" type="date" placeholder="Dept. Date" />
+                <!-- <button class="button is-primary" type="submit">Departure Date<i class="far fa-calendar-alt"></i></button> -->
+            </div>
+            <div class="column is-narrow">
+                <input id="destination-input" class="input is-primary is-normal"type="text" placeholder="Destination">
+            </div>
+            <div class="column is-narrow">
+                <input id="return-date" class="input is-primary" type="date" placeholder="Return Date" />
+                <!-- <button  class="button is-primary" type="submit">Return Date<i class="far fa-calendar-alt"></i></button> -->
+            </div>
+            <!-- <div class="column is-narrow">
+                <input id="passengers" class="input is-primary is-normal"type="text" placeholder="# of passengers">
+            </div> -->
+            <div class="column is-narrow">
+                <button  id="flight-search-button" class="button is-primary">Search</button>
             </div>
         </div>
+    </section>
+
+    <section class="flight-section">
+        <div class="content-container">
+            <h4 class="title is-4">Flight</h4>
+            <hr />
+
+            <h5 class="title is-5">Outbound Flights: (Select 1)</h5>
+            <div id="flight-quote-results">
+            </div>
+
+            <h5 class="title is-5">Return Flights: (Select 1)</h5>
+            <div id="return-flight-quote-results">
         
-    </main>
+            </div>
+        </div>
+    </section>
 
-    <footer>
-        <h5></h5>
-    </footer>
-<script src="./assets/js/scrypt.js"></script>
+    <section class="event-section">
+        <div class="content-container">
+            <h4 class="title is-4">Local Events</h4>
+            <hr />
+
+            <p>No events found</p>
+        </div>
+    </section>
+
+    <!-- My Planned Trip Modal -->
+    
+        <div class="modal" id="planned-trip-modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <div class="modal-card-head">
+                    <h4>My Planned Trip Modal</h4>
+                </div>
+                <div class="modal-card-body">
+                    <div id="planned-trip-modal-content-container">
+      
+                    </div>
+                </div>
+                <div class="modal-card-foot">
+                    <button class="button is-danger" onClick="clearPlannedTrip()">Clear Planned Trip</button>
+                </div>
+            </div>
+            <button class="modal-close is-large" onClick="closePlannedTripModal()" aria-label="close"></button>
+        </div>
+
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src='./assets/js/script.js'></script>
 </body>
-
 </html>

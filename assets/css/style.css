@@ -1,17 +1,68 @@
-body {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
-    font-family: 'Rubik', sans-serif;
-    /* font-family: 'Noto Sans SC', sans-serif; */
-    padding-bottom: 8em;
+:root {
+    --primary-color: #00B89C;
 }
 
-main {
-    flex: 1 0 auto;
+.hero {
+    background-image: url(../media/beach.JPG);
+    background-position: center;
+    background-repeat:  no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-color: #999;
 }
 
-h1, h5 {
+.header {
+    margin-top: 100px;
+    max-height:180px;
+}
+
+
+
+.title {
     font-weight: bold;
-    z-index: 1;
+    /* color: rgb(255, 137, 68); */
+}
+
+.subtitle {
+    padding-bottom: 3rem;
+}
+
+.far {
+    padding-left: 4px;
+}
+
+.input {
+    max-width: 200px;
+}
+
+.content-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px 15px;
+}
+
+.flight-quote-results {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 50px 25px;
+}
+.flight-quote-card {
+    margin: 25px auto;
+}
+
+@media screen and (max-width: 1025px ) {
+.header {
+    margin-top: 0px;
+    padding: 0px;
+}
+
+.subtitle {
+    padding-bottom: 0;
+}
+    
+.columns {
+    display: flex;
+    flex-direction: column;
+}
+    
 }
