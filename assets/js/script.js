@@ -1,6 +1,7 @@
 let flightSearchFormE1 = document.getElementById('flight-search-button');
 let flightQuoteResultsE1 = document.getElementById('flight-quote-results');
 let returnFlightQuoteResultsE1 = document.getElementById('return-flight-quote-results');
+let hotelListE1 = document.getElementById('hotel-list');
 let plannedTripModalE1 = document.getElementById('planned-trip-modal');
 let plannedTripModalContentE1 = document.getElementById('planned-trip-modal-content-container');
 
@@ -31,6 +32,24 @@ function createMyPlannedTripModalContent() {
             <button class="button is-danger" onClick="removeSavedFlight('return-flight-quote-results', 'modal')">Remove Flight</button>
         `;
     }
+
+    // Hotel html
+    let hotel = '<p>No hotel saved.</p>';
+    if (plannedTrip?.hotel?.hotel_id) {
+        hotel = `
+            <div class="columns">
+                <div class="column is-one-third">
+                    <img src='${plannedTrip.hotel.max_1440_photo_url}' width="200px" />
+                </div>
+                <div class="column is-two-thirds">
+                    <h4 class="title is-5 mb-2">${plannedTrip.hotel.hotel_name}</h5>
+                    <p class="bold">Estimated Price: ${convertToCurrency(plannedTrip.hotel.price_breakdown.gross_price)}</p>
+                    <button class="button is-danger mt-3" onClick="removeHotelFromLocalStorage('modal')">Remove</button>
+                </div>
+            </div>
+        `;
+    }
+
     
     // plannedTripModalContentE1.innerHTML = JSON.stringify(plannedTrip);
     plannedTripModalContentE1.innerHTML = `
@@ -49,7 +68,7 @@ function createMyPlannedTripModalContent() {
             <div class="title is-4 mt-4">Selected Hotel</div>
             <hr />
             <div id="planned-hotels-list">
-                <p>Display saved hotel details here....</p>
+                ${hotel}
             </div>
         </div>
     </div>
@@ -204,6 +223,16 @@ function saveFlightData(quoteId, originId, destinationId, flightType, carrierNam
     renderFlightList(parentElement, {});
 }
 
+// Save returned hotels in session storage
+function saveHotelDataInSession(hotels) {
+    sessionStorage.setItem("hotels", JSON.stringify(hotels));
+}
+
+// Get saved hotels from session storage
+function getSessionHotelData() {
+    return JSON.parse(sessionStorage.getItem("hotels"));
+}
+
 // Get Saved Flight Data in Session Storage
 function getSessionFlightData() {
     return JSON.parse(sessionStorage.getItem("returnedFlights"));
@@ -215,6 +244,129 @@ function saveReturnedFlightData(flights, returnFlights) {
         flights, 
         returnFlights
     }));
+}
+
+// Save hotel to local storage
+function saveHotelToLocalStorage(hotelId) {
+    // Get planned trip from local storage
+    let plannedTrip = getPlannedTripInformation();
+
+    // Find hotel in session by provided hotelId
+    let hotels = getSessionHotelData() || [];
+    let hotel = {};
+    // Loop through session hotels and get the correct hotel
+    for (let i = 0; i < hotels.result.length; i++) {
+        if (hotels.result[i].hotel_id == hotelId) {
+            hotel = hotels.result[i];
+        }
+    }
+
+    // update planned trip and add hotel
+    localStorage.setItem("plannedTrip", JSON.stringify({
+        ...plannedTrip,
+        hotel
+    }));
+
+    renderHotels();
+}
+
+// Remove hotel from local storage
+function removeHotelFromLocalStorage(source) {
+    // Get planned trip from local storage
+    let plannedTrip = getPlannedTripInformation();
+
+    // update planned trip and remove hotel
+    localStorage.setItem("plannedTrip", JSON.stringify({
+        ...plannedTrip,
+        hotel: {}
+    }));
+
+    renderHotels();
+    if (source === "modal") {
+        refreshPlannedTripModal();
+    }
+}
+
+// Create hotel row
+function createHotelRow(hotel) {
+    // Create hotel row for parent table
+    let hotelRow = document.createElement('tr');
+
+    // Create hotel image element
+    let hotelImage = document.createElement('td');
+    hotelImage.innerHTML = `
+        <img src=${hotel.max_1440_photo_url} width="100px"/>
+    `;
+
+    // Create hotel name element
+    let hotelName = document.createElement('td');
+    hotelName.innerHTML = `${hotel.hotel_name}`;
+
+    // Create price element
+    let hotelPrice = document.createElement('td');
+    hotelPrice.innerHTML = `${convertToCurrency(hotel.price_breakdown.gross_price)}`;
+
+    // Create save button
+    let hotelButton = document.createElement('td');
+    hotelButton.innerHTML = `
+        <button class="button is-success" onClick="saveHotelToLocalStorage('${hotel.hotel_id}')">Save Hotel</button>
+    `;
+
+    // Get planned trip information
+    let savedHotel = getPlannedTripInformation();
+    savedHotel = savedHotel.hotel || {};
+    
+    // Check if this hotel is saved in local storage
+    if (savedHotel?.hotel_id) {
+        if (savedHotel.hotel_id == hotel.hotel_id) {
+            hotelButton.innerHTML = `
+                <button class="button is-danger" onClick="removeHotelFromLocalStorage()">Remove</button>
+            `;
+        }
+    }
+
+    // Append children
+    hotelRow.appendChild(hotelImage);
+    hotelRow.appendChild(hotelName);
+    hotelRow.appendChild(hotelPrice);
+    hotelRow.appendChild(hotelButton);
+
+    // return hotel row
+    return hotelRow;
+}
+
+// Render hotels
+function renderHotels(params) {
+    hotelListE1.innerHTML = "";
+
+    let hotels = getSessionHotelData() || [];
+    if (hotels?.result) {
+        hotels = hotels.result;
+    }
+    
+    let hotelTableE1 = document.createElement('table');
+    hotelTableE1.className = 'table';
+    let hotelTableBodyE1 = document.createElement('tbody');
+
+    let hotelTableHeadings = document.createElement('tr');
+    hotelTableHeadings.innerHTML = `
+        <th>Image</th>
+        <th>Hotel</th>
+        <th>Price</th>
+        <th></th>
+    `;
+
+    hotelTableBodyE1.appendChild(hotelTableHeadings);
+
+    for (let i = 0; i < hotels.length; i++) {
+        let hotelRow = createHotelRow(hotels[i]);
+        hotelTableBodyE1.appendChild(hotelRow);
+    }
+
+    hotelTableE1.appendChild(hotelTableBodyE1);
+
+    hotelListE1.appendChild(hotelTableE1);
+
 }
 
 // Render flights
@@ -400,7 +552,7 @@ async function searchLocationBooking(cityName) {
     }
 
     return await fetch(url, params)
-    .then(response => response)
+    .then(response => response.text())
     .then(locationResponseData => locationResponseData)
     .catch(error => {
         console.log(error);
@@ -419,7 +571,7 @@ async function searchHotelsBooking(destId, checkInDate, checkOutDate) {
     }
 
     return await fetch(url, params)
-    .then(result => result )
+    .then(result => result.text())
     .then(hotelData => hotelData)
     .catch(error => {
         console.log(error);
@@ -464,30 +616,62 @@ async function searchFlightsAndEvents(event) {
     // Step 1 - Get CityName from returned flightResults 
     let sessionFlightData = getSessionFlightData();
     let cityName = '';
+    let countryName  = '';
     if (sessionFlightData?.flights?.Places) {
         for (let i = 0; i < sessionFlightData.flights.Places.length; i++ ) {
             if (sessionFlightData.flights.Places[i].IataCode.toUpperCase() == destination.toUpperCase()) {
                 cityName = sessionFlightData.flights.Places[i].CityName;
+                countryName = sessionFlightData.flights.Places[i].CountryName;
             }
         }
     }
 
-    // Step 2 - Use cityName as parameter pass into searchLocationBooking function
-    let locationResult = await searchLocationBooking(cityName);
-    console.log(locationResult);
+    if (cityName && countryName) {
+        // Step 2 - Use cityName as parameter pass into searchLocationBooking function
+        let locationResult = JSON.parse(await searchLocationBooking(cityName)) || [];
+        console.log(locationResult);
 
-    // Step 3 -Get dest_id from returned response from searchLocationbooking call
-    let destId = '20014181';
+        // Step 3 -Get dest_id from returned response from searchLocationbooking call
+        // loop through returned locations and select one
+        let destId = '';
+        let locationLabel = '';
+        for (let i = 0; i < locationResult.length; i++) {
+            console.log(`${locationResult[i].type} - ${locationResult[i].country }`);
+            if (locationResult[i].type === "ci" && locationResult[i].country == countryName) {
+                destId = locationResult[i].dest_id;
+                locationLabel = locationResult[i].label;
+            }
+        } 
 
-    // Step 4 - Call Hotel Search with dest_id 
-    let hotelResults = await searchHotelsBooking(
-        destId,
-        departDate,
-        returnDate
-    );
-    console.log(hotelResults);
+        console.log({
+            cityName,
+            countryName,
+            destId,
+            locationLabel
+        })
 
-    // Step 5 - Render on front-end
+        // Step 4 - Call Hotel Search with dest_id 
+        if (destId) {
+            let hotelResults = JSON.parse(await searchHotelsBooking(
+                destId,
+                departDate,
+                returnDate
+            ));
+            console.log(hotelResults);
+
+            // store in session storage
+            saveHotelDataInSession(hotelResults);
+        }
+
+        // Step 5 - Render on front-end
+        renderHotels({
+            cityName,
+            countryName,
+            destId,
+            locationLabel
+        });
+    }
+    
 
 }
 
