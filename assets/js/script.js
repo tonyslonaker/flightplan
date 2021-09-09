@@ -73,11 +73,17 @@ function closePlannedTripModal() {
 function clearPlannedTrip() {
     localStorage.removeItem('plannedTrip');
     refreshPlannedTripModal();
+
+    // Re-render the saved flight lists
+    renderFlightList(flightQuoteResultsE1, {});
+    renderFlightList(returnFlightQuoteResultsE1, {});
 }
 
 // Refresh modal
 function refreshPlannedTripModal() {
+    // Close Modal
     closePlannedTripModal();
+    // Open modal to get new dom build of planned trip content
     openPlannedTripModal();
 }
 
@@ -333,7 +339,7 @@ function matchAgainstSavedFlights(flightType, quoteId, originId, destinationId) 
 
 // Compile Flight Quote Card
 function compileFlightQuoteCard(flightDetails, flightType) {
-    // Check if we have saved this flight
+    // Check if we have saved this flight so we can render the appropriate button
     let matchedFlight = matchAgainstSavedFlights(flightType, flightDetails.QuoteId, flightDetails.OutboundLeg.OriginId, flightDetails.OutboundLeg.DestinationId);
     let button = `<button class="button is-success" id="${flightDetails.QuoteId}-${flightDetails.OutboundLeg.OriginId}-${flightDetails.OutboundLeg.DestinationId}" onClick="saveFlightData(${flightDetails.QuoteId}, ${flightDetails.OutboundLeg.OriginId}, ${flightDetails.OutboundLeg.DestinationId}, '${flightType}', '${flightDetails.carrierNameList[0]}', '${flightDetails.originPlaceDetails.IataCode}', '${flightDetails.destinationPlaceDetails.IataCode}')">Save Flight</button>`;
     if (matchedFlight) {
@@ -380,6 +386,46 @@ async function callSkyScannerAPI(origin, destination, takeOffDate) {
     .catch(error => console.log('error', error));
 }
 
+// Booking API - Search Location
+async function searchLocationBooking(cityName) {
+    let url = `https://booking-com.p.rapidapi.com/v1/hotels/locations?locale=en-us&name=${cityName}`;
+    let params = {
+        method: 'GET',
+        // locale: 'en-us',
+        // name: cityName,
+        headers: {
+            "x-rapidapi-host": "booking-com.p.rapidapi.com",
+            "x-rapidapi-key": "1047be0014msh7da5d44202bb0e4p1ba9a6jsn68f71fe1abf0"
+        }
+    }
+
+    return await fetch(url, params)
+    .then(response => response)
+    .then(locationResponseData => locationResponseData)
+    .catch(error => {
+        console.log(error);
+    })
+}
+
+// Booking API - Search Hotels
+async function searchHotelsBooking(destId, checkInDate, checkOutDate) {
+    let url = `https://booking-com.p.rapidapi.com/v1/hotels/search?units=metric&order_by=popularity&checkin_date=${checkInDate}&filter_by_currency=USD&adults_number=1&checkout_date=${checkOutDate}&dest_id=${destId}&locale=en-gb&dest_type=city&room_number=1`;
+    let params = {
+        method: 'GET',
+        headers: {
+            "x-rapidapi-host": "booking-com.p.rapidapi.com",
+            "x-rapidapi-key": "1047be0014msh7da5d44202bb0e4p1ba9a6jsn68f71fe1abf0"
+        }
+    }
+
+    return await fetch(url, params)
+    .then(result => result )
+    .then(hotelData => hotelData)
+    .catch(error => {
+        console.log(error);
+    })
+}
+
 // Search flights and events
 async function searchFlightsAndEvents(event) {
     event.preventDefault();
@@ -413,9 +459,37 @@ async function searchFlightsAndEvents(event) {
     // Render return flights on UI
     renderFlightList(returnFlightQuoteResultsE1, searchParams);
 
-    // Search Events? 
-    //
-    //
+    // Search Hotels
+
+    // Step 1 - Get CityName from returned flightResults 
+    let sessionFlightData = getSessionFlightData();
+    let cityName = '';
+    if (sessionFlightData?.flights?.Places) {
+        for (let i = 0; i < sessionFlightData.flights.Places.length; i++ ) {
+            if (sessionFlightData.flights.Places[i].IataCode.toUpperCase() == destination.toUpperCase()) {
+                cityName = sessionFlightData.flights.Places[i].CityName;
+            }
+        }
+    }
+    console.log(cityName)
+
+    // Step 2 - Use cityName as parameter pass into searchLocationBooking function
+    let locationResult = await searchLocationBooking(cityName);
+    console.log(locationResult);
+
+    // Step 3 -Get dest_id from returned response from searchLocationbooking call
+    let destId = '20014181';
+
+    // Step 4 - Call Hotel Search with dest_id 
+    let hotelResults = await searchHotelsBooking(
+        destId,
+        departDate,
+        returnDate
+    );
+    console.log(hotelResults);
+
+    // Step 5 - Render on front-end
+
 }
 
 flightSearchFormE1.addEventListener("click", searchFlightsAndEvents);
