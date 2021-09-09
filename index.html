@@ -27,9 +27,6 @@
             </div>
             <div id="navbarMenuHeroA" class="navbar-menu">
               <div class="navbar-end">
-                <a class="navbar-item is-active">
-                  Flight Search
-                </a>
                 <a class="navbar-item" id="my-planned-trip-link" onClick="openPlannedTripModal()">
                   My Planned Trip
                 </a>
@@ -44,7 +41,7 @@
           <div class="container has-text-centered">
             <h2 class="title is-2">Plan your eventful trip</h2>
             <p class="subtitle">
-              Blah Blah Blah Blah
+              Search flights and hotels
             </p>
           </div>
           <div class="columns is-centered is-vcentered is-desktop"> 
@@ -73,15 +70,14 @@
 
     <section class="flight-section">
         <div class="content-container">
-            <h4 class="title is-4">Flights</h4>
+            <h4 class="title is-4">Flight</h4>
             <hr />
 
-            <h5 class="title is-5">Outbound Flights</h5>
+            <h5 class="title is-5">Outbound Flights: (Select 1)</h5>
             <div id="flight-quote-results">
-                <h2>No found flights. Please complete the form above to search for flights.</h2>
             </div>
 
-            <h5 class="title is-5">Return Flights</h5>
+            <h5 class="title is-5">Return Flights: (Select 1)</h5>
             <div id="return-flight-quote-results">
         
             </div>
@@ -90,7 +86,7 @@
 
     <section class="event-section">
         <div class="content-container">
-            <h4 class="title is-4">Local Events</h4>
+            <h4 class="title is-4">Local Hotel</h4>
             <hr />
 
             <p>No events found</p>
@@ -101,12 +97,18 @@
     
         <div class="modal" id="planned-trip-modal">
             <div class="modal-background"></div>
-            <div class="modal-content">
-              <h4>My Planned Trip Modal</h4>
-              <hr />
-              <div id="planned-trip-modal-content-container">
-
-              </div>
+            <div class="modal-card">
+                <div class="modal-card-head">
+                    <div class="title is-4">My Planned Trip Modal</div>
+                </div>
+                <div class="modal-card-body">
+                    <div id="planned-trip-modal-content-container">
+      
+                    </div>
+                </div>
+                <div class="modal-card-foot">
+                    <button class="button is-danger" onClick="clearPlannedTrip()">Clear Planned Trip</button>
+                </div>
             </div>
             <button class="modal-close is-large" onClick="closePlannedTripModal()" aria-label="close"></button>
         </div>

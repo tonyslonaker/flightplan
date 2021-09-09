@@ -4,19 +4,87 @@ let returnFlightQuoteResultsE1 = document.getElementById('return-flight-quote-re
 let plannedTripModalE1 = document.getElementById('planned-trip-modal');
 let plannedTripModalContentE1 = document.getElementById('planned-trip-modal-content-container');
 
-// Open planned trip modal
-function openPlannedTripModal() {
+// Create My Planned Trip modal content
+function createMyPlannedTripModalContent() {
     let plannedTrip = getPlannedTripInformation();
 
+    // Outbound flight html
+    let outboundFlightHTML = `<p>No saved outbound flight</p>`;
+    if (plannedTrip?.outboundFlight?.QuoteId) {
+        outboundFlightHTML = `
+            <p>Departure Date: ${moment(plannedTrip.outboundFlight.OutboundLeg).format('MM/DD/YYYY')}</p>
+            <p>Carrier: ${plannedTrip.outboundFlight.carrierName}</p>
+            <p>Origin: ${plannedTrip.outboundFlight.originIata}</p>
+            <p>Destination: ${plannedTrip.outboundFlight.destinationIata}</p>
+            <button class="button is-danger" onClick="removeSavedFlight('flight-quote-results', 'modal')">Remove Flight</button>
+        `;
+    }
+
+    // Return flight html
+    let returnFlightHTML = `<p>No saved return flight</p>`;
+    if (plannedTrip?.returnFlight?.QuoteId) {
+        returnFlightHTML = `
+            <p>Departure Date: ${moment(plannedTrip.returnFlight.OutboundLeg).format('MM/DD/YYYY')}</p>
+            <p>Carrier: ${plannedTrip.returnFlight.carrierName}</p>
+            <p>Origin: ${plannedTrip.returnFlight.originIata}</p>
+            <p>Destination: ${plannedTrip.returnFlight.destinationIata}</p>
+            <button class="button is-danger" onClick="removeSavedFlight('return-flight-quote-results', 'modal')">Remove Flight</button>
+        `;
+    }
+    
+    // plannedTripModalContentE1.innerHTML = JSON.stringify(plannedTrip);
+    plannedTripModalContentE1.innerHTML = `
+    <div id="planned-trip-modal-content">
+        <div class="planned-trip-section" id="planned-flights">
+            <div class="title is-4">Flight Information</div>
+            <hr />
+            <div id="planned-flight-list">
+                <div class="title is-5 mb-1">Outbound Flight</div>
+                ${outboundFlightHTML}
+                <div class="title is-5 mb-1 mt-3">Return Flight</div>
+                ${returnFlightHTML}
+            </div>
+        </div>
+        <div class="planned-trip-section" id="planned-hotel">
+            <div class="title is-4 mt-4">Selected Hotel</div>
+            <hr />
+            <div id="planned-hotels-list">
+                <p>Display saved hotel details here....</p>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+// Open planned trip modal
+function openPlannedTripModal() {
     plannedTripModalE1.className = "modal is-active";
 
-    plannedTripModalContentE1.innerHTML = JSON.stringify(plannedTrip);
-    
+    // Set modal content
+    createMyPlannedTripModalContent();
 }
 
 // Close planned trip modal
 function closePlannedTripModal() {
     plannedTripModalE1.className = "modal";
+}
+
+// Clear planned trip from local storage
+function clearPlannedTrip() {
+    localStorage.removeItem('plannedTrip');
+    refreshPlannedTripModal();
+
+    // Re-render the saved flight lists
+    renderFlightList(flightQuoteResultsE1, {});
+    renderFlightList(returnFlightQuoteResultsE1, {});
+}
+
+// Refresh modal
+function refreshPlannedTripModal() {
+    // Close Modal
+    closePlannedTripModal();
+    // Open modal to get new dom build of planned trip content
+    openPlannedTripModal();
 }
 
 // Get planned trip information from local storage
@@ -27,7 +95,7 @@ function getPlannedTripInformation() {
 }
 
 // Remove saved flight
-function removeSavedFlight(flightType) {
+function removeSavedFlight(flightType, source) {
     let plannedTrip = getPlannedTripInformation();
     let parentElement;
 
@@ -48,11 +116,16 @@ function removeSavedFlight(flightType) {
         [flightType]: {}
     }));
 
+    // If source click was from My Planned Trip modal, refresh the modal
+    if (source === "modal") {
+        refreshPlannedTripModal();
+    }
+
     renderFlightList(parentElement, {});
 }
 
 // Save flight information in local storage
-function saveFlightData(quoteId, originId, destinationId, flightType) {
+function saveFlightData(quoteId, originId, destinationId, flightType, carrierName, originIata, destinationIata) {
     // alert(JSON.stringify({
     //     quoteId, 
     //     originId,
@@ -120,7 +193,10 @@ function saveFlightData(quoteId, originId, destinationId, flightType) {
     localStorage.setItem("plannedTrip", JSON.stringify({
         ...plannedTrip,
         [flightType]: {
-            ...flightDetails // Store new flight details
+            ...flightDetails, // Store new flight details
+            carrierName,
+            originIata,
+            destinationIata
         }
     }));
 
@@ -146,7 +222,7 @@ function renderFlightList(parentElement, searchParams) {
     // set the innerHTML for the current container to nothing.
     parentElement.innerHTML = "";
 
-    // Get session flights
+    // Get stored session flights flights: {flights, returnedFlights}
     let flights = getSessionFlightData(); 
 
     // Determine which type we want to render - Outbound/Return flights
@@ -159,13 +235,6 @@ function renderFlightList(parentElement, searchParams) {
     } else {
         console.log({ error: 'Unable to determine flight type.'} );
     }
-
-    // Create flight quote details headings div
-    let flightQuoteDetailsHeader = document.createElement('div');
-    // flightQuoteDetailsHeader.innerHTML = `
-    //         <h3>${searchParams.origin} -> ${searchParams.destination}</h3>
-    //     `;
-    flightQuoteDetailsHeader.innerHTML = '';
 
     // Create div element for flight list
     let flightList = document.createElement("div");
@@ -226,8 +295,6 @@ function renderFlightList(parentElement, searchParams) {
         `;
     }
 
-    // Append the flight quote details headings
-    parentElement.appendChild(flightQuoteDetailsHeader);
     // Append the list of flight quote cards
     parentElement.appendChild(flightList);
 }
@@ -272,9 +339,9 @@ function matchAgainstSavedFlights(flightType, quoteId, originId, destinationId) 
 
 // Compile Flight Quote Card
 function compileFlightQuoteCard(flightDetails, flightType) {
-    // Check if we have saved this flight
+    // Check if we have saved this flight so we can render the appropriate button
     let matchedFlight = matchAgainstSavedFlights(flightType, flightDetails.QuoteId, flightDetails.OutboundLeg.OriginId, flightDetails.OutboundLeg.DestinationId);
-    let button = `<button class="button is-success" id="${flightDetails.QuoteId}-${flightDetails.OutboundLeg.OriginId}-${flightDetails.OutboundLeg.DestinationId}" onClick="saveFlightData(${flightDetails.QuoteId}, ${flightDetails.OutboundLeg.OriginId}, ${flightDetails.OutboundLeg.DestinationId}, '${flightType}')">Save Flight</button>`;
+    let button = `<button class="button is-success" id="${flightDetails.QuoteId}-${flightDetails.OutboundLeg.OriginId}-${flightDetails.OutboundLeg.DestinationId}" onClick="saveFlightData(${flightDetails.QuoteId}, ${flightDetails.OutboundLeg.OriginId}, ${flightDetails.OutboundLeg.DestinationId}, '${flightType}', '${flightDetails.carrierNameList[0]}', '${flightDetails.originPlaceDetails.IataCode}', '${flightDetails.destinationPlaceDetails.IataCode}')">Save Flight</button>`;
     if (matchedFlight) {
         button = `<button class="button is-danger" id="${flightDetails.QuoteId}-${flightDetails.OutboundLeg.OriginId}-${flightDetails.OutboundLeg.DestinationId}" onClick="removeSavedFlight('${flightType}')">Remove Saved Flight</button>`;
     }
@@ -319,6 +386,46 @@ async function callSkyScannerAPI(origin, destination, takeOffDate) {
     .catch(error => console.log('error', error));
 }
 
+// Booking API - Search Location
+async function searchLocationBooking(cityName) {
+    let url = `https://booking-com.p.rapidapi.com/v1/hotels/locations?locale=en-us&name=${cityName}`;
+    let params = {
+        method: 'GET',
+        // locale: 'en-us',
+        // name: cityName,
+        headers: {
+            "x-rapidapi-host": "booking-com.p.rapidapi.com",
+            "x-rapidapi-key": "1047be0014msh7da5d44202bb0e4p1ba9a6jsn68f71fe1abf0"
+        }
+    }
+
+    return await fetch(url, params)
+    .then(response => response)
+    .then(locationResponseData => locationResponseData)
+    .catch(error => {
+        console.log(error);
+    })
+}
+
+// Booking API - Search Hotels
+async function searchHotelsBooking(destId, checkInDate, checkOutDate) {
+    let url = `https://booking-com.p.rapidapi.com/v1/hotels/search?units=metric&order_by=popularity&checkin_date=${checkInDate}&filter_by_currency=USD&adults_number=1&checkout_date=${checkOutDate}&dest_id=${destId}&locale=en-gb&dest_type=city&room_number=1`;
+    let params = {
+        method: 'GET',
+        headers: {
+            "x-rapidapi-host": "booking-com.p.rapidapi.com",
+            "x-rapidapi-key": "1047be0014msh7da5d44202bb0e4p1ba9a6jsn68f71fe1abf0"
+        }
+    }
+
+    return await fetch(url, params)
+    .then(result => result )
+    .then(hotelData => hotelData)
+    .catch(error => {
+        console.log(error);
+    })
+}
+
 // Search flights and events
 async function searchFlightsAndEvents(event) {
     event.preventDefault();
@@ -337,24 +444,51 @@ async function searchFlightsAndEvents(event) {
     
     // Save flights in session storage
     saveReturnedFlightData(JSON.parse(flightResults), JSON.parse(returnFlightResults));
+
+    // Create searchParams object to pass into render function
+    let searchParams = {
+        origin,
+        destination,
+        departDate,
+        returnDate
+    }
     
-    renderFlightList(flightQuoteResultsE1, {
-        origin,
-        destination,
+    // Render outbound flights on UI
+    renderFlightList(flightQuoteResultsE1, searchParams);
+
+    // Render return flights on UI
+    renderFlightList(returnFlightQuoteResultsE1, searchParams);
+
+    // Search Hotels
+
+    // Step 1 - Get CityName from returned flightResults 
+    let sessionFlightData = getSessionFlightData();
+    let cityName = '';
+    if (sessionFlightData?.flights?.Places) {
+        for (let i = 0; i < sessionFlightData.flights.Places.length; i++ ) {
+            if (sessionFlightData.flights.Places[i].IataCode.toUpperCase() == destination.toUpperCase()) {
+                cityName = sessionFlightData.flights.Places[i].CityName;
+            }
+        }
+    }
+
+    // Step 2 - Use cityName as parameter pass into searchLocationBooking function
+    let locationResult = await searchLocationBooking(cityName);
+    console.log(locationResult);
+
+    // Step 3 -Get dest_id from returned response from searchLocationbooking call
+    let destId = '20014181';
+
+    // Step 4 - Call Hotel Search with dest_id 
+    let hotelResults = await searchHotelsBooking(
+        destId,
         departDate,
         returnDate
-    });
+    );
+    console.log(hotelResults);
 
-    renderFlightList(returnFlightQuoteResultsE1, {
-        origin,
-        destination,
-        departDate,
-        returnDate
-    });
+    // Step 5 - Render on front-end
 
-    // Search Events? 
-    //
-    //
 }
 
 flightSearchFormE1.addEventListener("click", searchFlightsAndEvents);
