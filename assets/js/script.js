@@ -471,7 +471,6 @@ async function searchFlightsAndEvents(event) {
             }
         }
     }
-    console.log(cityName)
 
     // Step 2 - Use cityName as parameter pass into searchLocationBooking function
     let locationResult = await searchLocationBooking(cityName);
