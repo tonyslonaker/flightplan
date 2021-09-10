@@ -1,3 +1,7 @@
+:root {
+    --primary-color: #00B89C;
+}
+
 .hero {
     background-image: url(../media/beach.JPG);
     background-position: center;
@@ -16,7 +20,7 @@
 
 .title {
     font-weight: bold;
-    color: rgb(255, 137, 68);
+    /* color: rgb(255, 137, 68); */
 }
 
 .subtitle {
@@ -29,6 +33,21 @@
 
 .input {
     max-width: 200px;
+}
+
+.content-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px 15px;
+}
+
+.flight-quote-results {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 50px 25px;
+}
+.flight-quote-card {
+    margin: 25px auto;
 }
 
 @media screen and (max-width: 1025px ) {

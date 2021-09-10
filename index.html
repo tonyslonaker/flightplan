@@ -10,31 +10,113 @@
     <title>Eventful Trip</title>
 </head>
 <body>
-    <section class="hero is-fullheight">
-            <div class="header is-overlay has-text-centered">
-                <h1 class="title is-1">Plan your eventful trip</h1>
-                <h2 class="subtitle is-4 has-text-primary">Real time events and flight</h2>
-                <div class="columns is-centered is-vcentered is-desktop">
-                    <div class="column is-narrow">
-                        <input id="from-input" class="input is-primary is-normal" type="text" placeholder="From">
-                    </div>
-                    <div class="column is-narrow">
-                        <button class="button is-primary" type="submit">Departure Date<i class="far fa-calendar-alt"></i></button>
-                    </div>
-                    <div class="column is-narrow">
-                        <input id="to-input" class="input is-primary is-normal"type="text" placeholder="To">
-                    </div>
-                    <div class="column is-narrow">
-                        <button  class="button is-primary" type="submit">Return Date<i class="far fa-calendar-alt"></i></button>
-                    </div>
-                    <div class="column is-narrow">
-                        <input id="passengers" class="input is-primary is-normal"type="text" placeholder="# of passengers">
-                    </div>
-                    <div class="column is-narrow">
-                        <button  class="button is-primary" type="submit">Search</button>
+
+    <section class="hero is-primary is-medium">
+        <div class="hero-head">
+        <nav class="navbar">
+          <div class="container">
+            <div class="navbar-brand">
+              <a class="navbar-item">
+                <h2>TripPlanner</h2>
+              </a>
+              <span class="navbar-burger" data-target="navbarMenuHeroA">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </div>
+            <div id="navbarMenuHeroA" class="navbar-menu">
+              <div class="navbar-end">
+                <a class="navbar-item" id="my-planned-trip-link" onClick="openPlannedTripModal()">
+                  My Planned Trip
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+      
+        <!-- Hero content: will be in the middle -->
+        <div class="hero-body">
+          <div class="container has-text-centered">
+            <h2 class="title is-2">Plan your eventful trip</h2>
+            <p class="subtitle">
+              Search flights and hotels
+            </p>
+          </div>
+          <div class="columns is-centered is-vcentered is-desktop"> 
+            <div class="column is-narrow">
+                <input id="origin-input" class="input is-primary is-normal" type="text" placeholder="From">
+            </div>
+            <div class="column is-narrow">
+                <input id="departure-date" class="input is-primary" type="date" placeholder="Dept. Date" />
+                <!-- <button class="button is-primary" type="submit">Departure Date<i class="far fa-calendar-alt"></i></button> -->
+            </div>
+            <div class="column is-narrow">
+                <input id="destination-input" class="input is-primary is-normal"type="text" placeholder="Destination">
+            </div>
+            <div class="column is-narrow">
+                <input id="return-date" class="input is-primary" type="date" placeholder="Return Date" />
+                <!-- <button  class="button is-primary" type="submit">Return Date<i class="far fa-calendar-alt"></i></button> -->
+            </div>
+            <!-- <div class="column is-narrow">
+                <input id="passengers" class="input is-primary is-normal"type="text" placeholder="# of passengers">
+            </div> -->
+            <div class="column is-narrow">
+                <button  id="flight-search-button" class="button is-primary">Search</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="flight-section">
+        <div class="content-container">
+            <h4 class="title is-4">Flights</h4>
+            <hr />
+
+            <h5 class="title is-5">Outbound Flights: (Select 1)</h5>
+            <div id="flight-quote-results">
+            </div>
+
+            <h5 class="title is-5">Return Flights: (Select 1)</h5>
+            <div id="return-flight-quote-results">
+                
+            </div>
+        </div>
+    </section>
+
+    <section class="event-section">
+        <div class="content-container">
+            <h4 class="title is-4">Local Hotels</h4>
+            <hr />
+            <div id="hotel-list">
+
+            </div>
+        </div>
+    </section>
+
+    <!-- My Planned Trip Modal -->
+    
+        <div class="modal" id="planned-trip-modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <div class="modal-card-head">
+                    <div class="title is-4">My Planned Trip Modal</div>
+                </div>
+                <div class="modal-card-body">
+                    <div id="planned-trip-modal-content-container">
+      
                     </div>
                 </div>
+                <div class="modal-card-foot">
+                    <button class="button is-danger" onClick="clearPlannedTrip()">Clear Planned Trip</button>
+                </div>
             </div>
-    </section>
+            <button class="modal-close is-large" onClick="closePlannedTripModal()" aria-label="close"></button>
+        </div>
+
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src='./assets/js/script.js'></script>
 </body>
 </html>
